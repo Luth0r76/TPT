@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Psicológico TPT</title>
+    <!-- Importamos Chart.js para los gráficos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        /* Reset básico de CSS */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Estilos generales del cuerpo */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+
+        /* Contenedor principal */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            min-height: 500px;
+        }
+
+        /* Páginas del test */
+        .intro-page, .question-page, .results-page {
+            padding: 20px;
+        }
+
+        .intro-page {
+            text-align: center;
+        }
+
+        .question-page, .results-page {
+            display: none; /* Ocultas por defecto */
+        }
+
+        /* Encabezados y textos */
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1a365d;
+        }
+
+        .instructions {
+            text-align: left;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            max-width: 600px;
+        }
+
+        /* Elementos de las preguntas */
+        .question-number {
+            font-size: 1.2em;
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+    font-size: 1.3em;
+    margin-bottom: 30px;
+    line-height: 1.4;
+    font-weight: 600;  /* Añadido para hacer el texto en negrita */
+}
+
+        /* Contenedor de opciones */
+        .options-container {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Botones de opción */
+        .option-button {
+            padding: 15px 20px;
+            font-size: 1.1em;
+            background-color: #edf2f7;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .option-button:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        .option-button.selected {
+            background-color: #4299e1;
+            color: white;
+            border-color: #2b6cb0;
+        }
+
+        /* Botones de navegación */
+        .start-button, .next-button {
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    padding: 12px 24px;
+    font-size: 1.2em;
+    background: linear-gradient(90deg, #3B82F6 0%, #1E40AF 100%);  /* Gradiente azul */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;  /* Cambiado a 'all' para que afecte al gradiente */
+}
+
+        .start-button:hover, .next-button:hover {
+            background-color: #3182ce;
+        }
+
+        /* Barra de progreso */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #e2e8f0;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3B82F6 0%, #1E40AF 100%);  /* Mismo gradiente */
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+        /* Contenedor de gráficos */
+        .chart-container {
+            margin: 20px 0;
+            height: 600px;
+            position: relative;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos para los resultados */
+        .scale-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .scale-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .scale-details {
+            background-color: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .score-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .items-info {
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        /* Barra de percentil */
+        .percentil-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .percentil-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4299e1 0%, #48bb78 100%);
+            transition: width 0.5s ease;
+        }
+
+        /* Items de resultado */
+        .result-item {
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        /* Badges de estado */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .status-badge.apt {
+            background-color: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-badge.not-apt {
+            background-color: #fed7d7;
+            color: #742a2a;
+        }
+
+        /* Estilos para la tabla de respuestas */
+        #answersTable table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        #answersTable th,
+        #answersTable td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        #answersTable th {
+            background-color: #f8fafc;
+            font-weight: bold;
+        }
+
+        #answersTable tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Página de introducción -->
+        <div id="introPage" class="intro-page">
+            <h1>Test Psicológico TPT</h1>
+            <div class="instructions">
+                <h2>Instrucciones</h2>
+                <p>Conteste una de las siguientes letras para indicar que esa forma de actuar es propia de usted:</p>
+                <ul>
+                    <li><strong>A.</strong> casi nunca</li>
+                    <li><strong>B.</strong> a veces</li>
+                    <li><strong>C.</strong> con frecuencia</li>
+                    <li><strong>D.</strong> casi siempre</li>
+                </ul>
+            </div>
+            <button class="start-button" onclick="startTest()">Comenzar Test</button>
+        </div>
+
+        <!-- Página de preguntas -->
+        <div id="questionPage" class="question-page">
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <div class="question-number" id="questionNumber"></div>
+            <div class="question-text" id="questionText"></div>
+            <div class="options-container">
+                <button class="option-button" onclick="selectOption('A')">A. casi nunca</button>
+                <button class="option-button" onclick="selectOption('B')">B. a veces</button>
+                <button class="option-button" onclick="selectOption('C')">C. con frecuencia</button>
+                <button class="option-button" onclick="selectOption('D')">D. casi siempre</button>
+            </div>
+            <button class="next-button" onclick="nextQuestion()" disabled>Siguiente</button>
+        </div>
+
+        <!-- Página de resultados -->
+        <div id="resultsPage" class="results-page">
+            <h1>Resultados del Test</h1>
+            <div id="generalResult"></div>
+            <div class="chart-container">
+                <canvas id="resultsChart"></canvas>
+            </div>
+            <div id="scaleResults"></div>
+            <div id="answersReview" class="mt-8">
+                <h2>Revisión de Respuestas</h2>
+                <div id="answersTable"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Array de preguntas del test
+        const questions = [
+            "Cuando algo no se resuelve no me siento mal e insisto hasta encontrar una solución.",
+            "Me siento vulnerable a las críticas de los demás.",
+            "Si se diera el caso, acudiría sin reparos a una manifestación contra el racismo.",
+            "Cuando no me apetece hacer una cosa, cualquier excusa me sirve.",
+            "Me molestan cierto tipo de pensamientos extraños.",
+            "Me molesta que la vida esté cambiando tan rápidamente.",
+            "Al irme a dormir suele haber algún pensamiento que me preocupa.",
+            "Me aburren los documentales sobre otras culturas.",
+            "Soy capaz de conseguir que los demás cambien de opinión.",
+            "Me gusta más empezar cosas nuevas que llevarlas a cabo.",
+            "Me atraen la vida y costumbres de otros pueblos.",
+            "Me da igual que todo el mundo sepa que he fallado en mi trabajo.",
+            "Si la hora de salida prevista de un viaje se retrasa por motivos ajenos a mí, me lo tomo con tranquilidad y paciencia.",
+            "Si me llegan varios problemas a la vez me siento mal y no sé qué hacer.",
+            "En mi entorno familiar o social se habla mal de mí.",
+            "Me siento inferior cuando hablo con una persona de mayor rango o nivel que yo.",
+            "Mantengo la confianza en mí cuando las cosas se ponen difíciles.",
+            "Acepto sin rechistar las órdenes que provienen de mis superiores.",
+            "Me empeño al máximo en conseguir lo que me propongo.",
+            "En mi vida están ausentes esas experiencias extrañas que tienen algunas personas.",
+            "Soy estricto con mi horario laboral para poder disfrutar de mi familia y amigos.",
+            "Evito los análisis médicos rutinarios por si me encuentran algo.",
+            "Cuando trabajo en equipo, si no se me hace caso me enfado considerablemente.",
+            "Si veo a alguien en apuros hago todo lo posible por ayudarle.",
+            "Me fío poco de los otros.",
+            "Sé cómo tratar a la gente.",
+            "Suelo estar muy fatigado al acabar la jornada laboral.",
+            "Me molesta no poder terminar algo que he empezado.",
+            "Cuando no sé hacer algo busco la ayuda de un compañero.",
+            "Me cuesta congeniar con alguien a quien constantemente le asaltan las dudas y no es capaz de tomar una decisión rápida.",
+            "Cuando me incorporo a una reunión me intereso por la conversación y trato de participar en ella.",
+            "Prefiero trabajar lentamente y sin presión.",
+            "Todo lo nuevo me encanta.",
+            "Cuando he trabajado en equipo he procurado compartir mis puntos de vista.",
+            "En una reunión prefiero que sean los demás quienes hablen.",
+            "Uno de mis lemas es: 'Piensa mal y acertarás'.",
+            "Mis sueños suelen tener un tono relajante o amable.",
+            "Si se produce una situación de emergencia, mantengo la calma y la serenidad.",
+            "Cuando me enfado puedo ser muy desagradable.",
+            "Me molesta mucho faltar al trabajo cuando estoy enfermo.",
+            "Me molesta que surjan imprevistos que hagan cambiar mis planes.",
+            "Si lo que hago me llega a producir tensión me pongo a hacer otra cosa.",
+            "Hay épocas en que, sin razón aparente, me siento más animado que de costumbre.",
+            "Cuando voy al cine u otro espectáculo no soporto tener que esperar en la cola.",
+            "Cuando me comprometo a algo, hago todo lo posible por cumplirlo.",
+            "Los fracasos reiterados me dejan desanimado.",
+            "Las emociones forman parte de mi comportamiento normal.",
+            "Evito asumir más trabajo hasta que termino lo que tengo entre manos.",
+            "Me produce cierta envidia ver triunfar a alguien similar a mí.",
+            "Cuando veo un accidente me siento mal y me alejo.",
+            "Por las mañanas me levanto lleno de energía y vitalidad.",
+            "Me resulta difícil marcarme objetivos ambiciosos y conseguirlos.",
+            "Si no congenio con alguien la primera vez que lo veo pienso que otro día podría ir mejor.",
+            "Vivo tranquilo ante lo que pueda pasar en el futuro.",
+            "Me gustan los retos nuevos porque estimulan mi iniciativa.",
+            "Critico a las personas informales o incumplidoras.",
+            "Me gusta gozar del afecto de todo el mundo.",
+            "Me cuesta trabajar muchas horas seguidas; necesito descansar de vez en cuando.",
+            "Cuando me desplazo al trabajo o a otro lugar muy conocido para mí, me gusta hacer el mismo recorrido cada día.",
+            "En los trabajos de grupo me implico como el que más.",
+            "Cuando las cosas van mal suelo darme por vencido.",
+            "Tengo un humor bastante estable.",
+            "Si tengo que ayudar a los demás, abandono lo que esté haciendo en ese momento.",
+            "Prefiero fijarme metas poco ambiciosas para estar seguro de alcanzarlas.",
+            "Soy comprensivo con otras religiones aunque no las comparta ni las practique.",
+            "He dejado de hacer alguna cosa por falta de confianza en mí mismo.",
+            "Estoy dispuesto a ayudar a los nuevos compañeros que empiezan a trabajar.",
+            "Soy tajante cuando tomo una decisión y no contemplo cambiar de opinión.",
+            "Cuando empiezo algo lo tengo que terminar, aunque me cueste más de lo previsto.",
+            "Cuando hago una reclamación salgo victorioso sin tener que subir de tono mi discurso.",
+            "Si estoy a gusto en mi trabajo el salario me importa muy poco.",
+            "Cuando algo me interesa, me dedico a ello sin sentir fatiga.",
+            "Si se me amontonan los problemas, me falla la confianza en mí mismo.",
+            "Me resulta fácil hablar con personas que no conozco de nada.",
+            "Últimamente tengo momentos malos o de inquietud.",
+            "Me desagrada la gente que llega tarde a una cita y se excusa con cualquier motivo.",
+            "Creo que las dificultades me han ayudado a superarme y a desarrollarme.",
+            "Creo que soy competente y eficaz en mi trabajo.",
+            "Evito verme envuelto en situaciones de constante cambio.",
+            "Creo que la mejor forma de descanso es cambiar de actividad.",
+            "Me interesan las culturas diferentes a la mía.",
+            "Prefiero dejar a otros la dirección de las actividades de grupo.",
+            "Me comporto de acuerdo a las normas sociales establecidas.",
+            "Me cuesta terminar las tareas monótonas y aburridas.",
+            "Intento estar localizable y disponible.",
+            "Me resulta difícil entablar amistad con una persona extranjera.",
+            "Suelo mantener la sonrisa y la calma cuando me enfado por algo o con alguien.",
+            "Me gusta probar la comida de otros países.",
+            "Me gusta discutir y enfrentarme a los demás.",
+            "Yo soy mi mejor consejero.",
+            "En mi trabajo soy una persona metódica y sistemática.",
+            "El estrés del trabajo o de la calle me estimula y mantiene vivo.",
+            "Me basto yo solo para resolver mis problemas.",
+            "Si alguien me decepciona, prefiero 'romper' cuanto antes esa relación.",
+            "Me agrada pasar una tarde viendo programas de información cultural.",
+            "Evito dar una buena idea a otro porque se aprovechará de ella.",
+            "Los grandes fracasos afectan a mi estado de ánimo.",
+            "Mis familiares y amigos me tratan bien.",
+            "Me gusta ser tratado como persona de cierta importancia.",
+            "Dedico parte de mi tiempo libre a mejorar profesionalmente.",
+            "Creo que alguien logra que haga cosas mediante sugestión o algún poder mental.",
+            "Me siento inseguro en mis relaciones con los demás.",
+            "Cuando hay problemas me ofrezco para solucionarlos.",
+            "El entusiasmo me ayuda a sentirme seguro.",
+            "Tengo plena confianza en la capacidad de mis compañeros.",
+            "Soy capaz de realizar varias tareas a la vez.",
+            "Procuro descargarme con quien me enfada con sus tonterías.",
+            "Mis amigos me confían sus temores y preocupaciones.",
+            "Me resulta fácil hacer nuevas amistades.",
+            "Soy tolerante con quienes no respetan las normas.",
+            "Me encuentro a gusto en entornos multirraciales.",
+            "Mantengo la calma en la mayoría de las situaciones.",
+            "Me siento atraído por las situaciones nuevas e inesperadas.",
+            "Los obstáculos y dificultades hacen que me supere para vencerlos.",
+            "A la hora de tomar una decisión lo pienso con calma y sin alterarme.",
+            "Creo poco en mi valía personal.",
+            "Los problemas demasiado difíciles me agobian y desaniman.",
+            "He tenido la impresión de que me estaban vigilando sin que yo supiera por qué.",
+            "Cambiaría la mayoría de las normas y reglas sociales establecidas.",
+            "La mayoría de las cosas me dejan preocupado.",
+            "Me molesta que alguien use mis cosas sin pedirme permiso.",
+            "En las reuniones sociales tengo don de gentes.",
+            "Para poder rendir en mi trabajo necesito hacer pausas frecuentes.",
+            "Tomo parte activa en los asuntos del grupo.",
+            "Me resulta difícil entablar conversación con extraños.",
+            "Los demás me hieren con sus críticas y juicios personales.",
+            "Se me puede hacer cambiar de opinión.",
+            "Tiendo a criticar en exceso a los demás.",
+            "Pierdo fácilmente la paciencia cuando trato con los demás.",
+            "Cuando las cosas salen mal espero que otros las resuelvan.",
+            "En mi tiempo libre practico algún deporte.",
+            "Cuando viajo, me intereso por las costumbres y estilo de vida del lugar al que voy.",
+            "Me molesta cuando algún imprevisto irrumpe en mi vida cotidiana.",
+            "Confío más en mí que en los demás.",
+            "Me siento más capaz de hacer cosas que antes.",
+            "Cuando mi jefe comete una injusticia conmigo trabajo a desgana.",
+            "Me siento libre de pensamientos raros o extravagantes.",
+            "Cuando me propongo algo pongo los medios adecuados para conseguirlo.",
+            "Puedo seguir actuando con bastante normalidad cuando hay retos y tensiones en mi vida.",
+            "Antes de actuar me paro a pensar en lo que los demás piensen de mí.",
+            "Me comporto igual entre amigos que en público.",
+            "Soy tan feliz como la mayoría de las personas.",
+            "Tengo la impresión de que la gente tiene mal concepto de mí.",
+            "Cuando la situación me pone tensa, mi cuerpo también se tensa y parece que voy a estallar.",
+            "Me resulta fácil hacer entrar en razón a los demás.",
+            "Cuando me topo con grandes obstáculos, prefiero buscar metas más asequibles.",
+            "Me gusta el riesgo y la aventura.",
+            "Prefiero la lectura y la contemplación a la actividad y el deporte.",
+            "Me gusta que se me reconozcan mis éxitos profesionales.",
+            "Por las noches suelo dormir de modo regular y tranquilo.",
+            "Si tuviera la oportunidad aprendería ruso.",
+            "Me molesta cuando alguien me pide ayuda para algo que podría hacer solo.",
+            "Me molesta y perturba tener que hablar a un grupo (como en una reunión social).",
+            "Mantengo la calma en situaciones tensas.",
+            "Me molesta estar inactivo y no tener nada que hacer.",
+            "Me molesta estar mucho tiempo haciendo lo mismo.",
+            "Me gustaría ser tan feliz como parecen los demás.",
+            "Me afectan poco los problemas de mi vida cotidiana.",
+            "Disfruto organizando y participando en actividades sociales.",
+            "Trabajo mejor solo que con otros compañeros."
+        ];
+
+        // Variables globales para el control del test
+        let currentQuestion = 0;  // Pregunta actual
+        const answers = {};       // Almacena las respuestas del usuario
+        let resultsChart = null;  // Referencia al gráfico de resultados
+        // Definición de escalas y sus propiedades
+        const scales = {
+            desajuste: {
+                name: "Desajuste",
+                validRange: { min: 0, max: 2 },
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [5, 15, 36, 96, 101, 118, 143],
+                    inversas: [20, 98, 137],
+                }
+            },
+                ansiedad: {
+                name: "Ansiedad",
+                validRange: { min: 0, max: 5 },
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [22, 47, 75, 129, 153],
+                    inversas: [37, 62, 112, 115, 158],
+                }
+            },
+                depresion: {
+                name: "Depresión",
+                validRange: { min: 0, max: 5 },
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [7, 43, 116, 120, 157],
+                    inversas: [54, 104, 135, 142, 150],
+                }
+            },
+                toleranciaFlexibilidad: {
+                name: "Tolerancia Flexibilidad",
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                validRange: { min: 19, max: 22 },
+                items: {
+                    directas: [65, 110, 70, 125],
+                    inversas: [30, 44, 56, 68, 76, 94, 121],
+                }
+            },
+                
+                toleranciaEstres: {
+                name: "Tolerancia al Estrés",
+                minScore: 22,
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [1, 87, 92, 96, 139, 154],
+                    inversas: [14, 42, 46, 107, 144]
+                }
+            },
+            autoConcepto: {
+                name: "Auto Concepto",
+                minScore: 24,
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [17, 38, 90, 93, 134],
+                    inversas: [50, 66, 73, 126, 140]
+                }
+            },
+            adaptacionCambio: {
+                name: "Adaptación al Cambio",
+                validRange: { min: 18, max: 23 },
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [13, 33, 113, 93, 147],
+                    inversas: [6, 41, 59, 79, 91, 133],
+                }
+            },
+            disponibilidad: {
+                name: "Disponibilidad",
+                minScore: 21,
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [24, 63, 85, 103, 108],
+                    inversas: [4, 21, 48, 130, 152]
+                }
+            },
+            integracionSocial: {
+                name: "Integración Social",
+                minScore: 25,
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [31, 53, 74, 83, 159],
+                    inversas: [2, 16, 25, 35, 119]
+                }
+            },
+            autoExigencia: {
+                name: "Auto Exigencia",
+                minScore: 26,
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [31, 53, 74, 83, 159],
+                    inversas: [2, 16, 25, 35, 119]
+                }
+            },
+            tesonConstancia: {
+                name: "Tesón/Constancia",
+                minScore: 26,
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [28, 45, 69, 77, 138],
+                    inversas: [10, 61, 84, 146, 156]
+                }
+            },
+            trabajoEquipo: {
+                name: "Trabajo en Equipo",
+                minScore: 27,
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [29, 34, 60, 67, 105, 124],
+                    inversas: [23, 82, 128, 160]
+                }
+            },
+            inteligenciaSocial: {
+                name: "Inteligencia Social",
+                minScore: 23,
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [9, 26, 70, 109, 122, 145],
+                    inversas: [39, 89, 102, 125]
+                }
+            },
+            autoexigenciaPersonal: {
+                name: "Autoexigencia Personal",
+                minScore: 26,
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [19, 40, 55, 78, 100, 114],
+                    inversas: [52, 58, 64, 117]
+                }
+            },
+            interesOtrasculturas: {
+                name: "Interés en Otras Culturas",
+                minScore: 26,
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [3, 11, 81, 88, 95, 111, 132, 151],
+                    inversas: [8, 86]
+                }
+            },
+            
+            dinamismo: {
+                name: "Dinamismo/Actividad",
+                minScore: 22,
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [51, 72, 80, 106, 131, 155],
+                    inversas: [27, 32, 123, 148]
+                }
+            }
+        };
+
+        // Funciones principales del test
+
+        // Función para iniciar el test
+        function startTest() {
+            document.getElementById('introPage').style.display = 'none';
+            document.getElementById('questionPage').style.display = 'block';
+            showQuestion();
+        }
+
+        // Función para mostrar una pregunta
+        function showQuestion() {
+            const questionNumber = document.getElementById('questionNumber');
+            const questionText = document.getElementById('questionText');
+            const nextButton = document.querySelector('.next-button');
+            const progressFill = document.getElementById('progressFill');
+            
+            // Actualizar número y texto de la pregunta actual
+            questionNumber.textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            questionText.textContent = questions[currentQuestion];
+            
+            // Actualizar la barra de progreso
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            progressFill.style.width = `${progress}%`;
+            
+            // Resetear los botones de opción
+            const options = document.querySelectorAll('.option-button');
+            options.forEach(button => button.classList.remove('selected'));
+            nextButton.disabled = true;
+            
+            // Si hay una respuesta previa, seleccionarla
+            if (answers[currentQuestion + 1]) {
+                const selectedButton = Array.from(options).find(
+                    button => button.textContent.startsWith(answers[currentQuestion + 1])
+                );
+                if (selectedButton) {
+                    selectedButton.classList.add('selected');
+                    nextButton.disabled = false;
+                }
+            }
+        }
+
+        // Función para seleccionar una opción de respuesta
+        function selectOption(option) {
+            const buttons = document.querySelectorAll('.option-button');
+            buttons.forEach(button => button.classList.remove('selected'));
+            
+            const selectedButton = Array.from(buttons).find(
+                button => button.textContent.startsWith(option)
+            );
+            if (selectedButton) {
+                selectedButton.classList.add('selected');
+            }
+            
+            // Guardar la respuesta y habilitar el botón siguiente
+            answers[currentQuestion + 1] = option;
+            document.querySelector('.next-button').disabled = false;
+        }
+
+        // Función para avanzar a la siguiente pregunta
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+        // Función para calcular las puntuaciones de todas las escalas
+        function calculateScores() {
+            const results = {};
+            
+            // Recorremos todas las escalas definidas
+            Object.entries(scales).forEach(([scaleKey, scale]) => {
+                let score = 0;
+                
+                // Calcular puntuación para ítems directos
+                scale.items.directas.forEach(item => {
+                    if (answers[item]) {
+                        score += scale.directas[answers[item]] || 0;
+                    }
+                });
+                
+                // Calcular puntuación para ítems inversos
+                scale.items.inversas.forEach(item => {
+                    if (answers[item]) {
+                        score += scale.inversas[answers[item]] || 0;
+                    }
+                });
+
+                // Determinar si es apto según el tipo de evaluación
+                let isApt = false;
+                if (scale.validRange) {
+                    isApt = score >= scale.validRange.min && score <= scale.validRange.max;
+                } else if (scale.minScore) {
+                    isApt = score >= scale.minScore;
+                }
+
+                // Guardar resultados de la escala
+                results[scaleKey] = {
+                    score,
+                    name: scale.name,
+                    validRange: scale.validRange,
+                    minScore: scale.minScore,
+                    isApt,
+                    items: scale.items
+                };
+            });
+            
+            // Devolver resultados y aptitud general
+            return {
+                scales: results,
+                generalAptitude: Object.values(results).every(result => result.isApt)
+            };
+        }
+
+        // Función auxiliar para obtener el texto de la respuesta
+        function getAnswerText(answer) {
+            const answerTexts = {
+                'A': 'Casi nunca',
+                'B': 'A veces',
+                'C': 'Con frecuencia',
+                'D': 'Casi siempre'
+            };
+            return answerTexts[answer] || 'Sin respuesta';
+        }
+
+        // Función para identificar las escalas afectadas por cada pregunta
+        function getAffectedScales(questionNumber) {
+            const affectedScales = [];
+            Object.entries(scales).forEach(([key, scale]) => {
+                if (scale.items.directas.includes(questionNumber)) {
+                    affectedScales.push(`${scale.name} (Directa)`);
+                }
+                if (scale.items.inversas.includes(questionNumber)) {
+                    affectedScales.push(`${scale.name} (Inversa)`);
+                }
+            });
+            return affectedScales.join(', ') || 'Ninguna';
+        }
+
+        // Función principal para mostrar los resultados
+        function showResults() {
+            document.getElementById('questionPage').style.display = 'none';
+            document.getElementById('resultsPage').style.display = 'block';
+            
+            const scores = calculateScores();
+            
+            // Mostrar resultado general (APTO/NO APTO)
+            const generalResult = document.getElementById('generalResult');
+            generalResult.className = `general-result ${scores.generalAptitude ? 'apt' : 'not-apt'}`;
+            generalResult.innerHTML = `
+                <h2 style="font-size: 2em; margin: 20px 0;">
+                    ${scores.generalAptitude ? 'APTO' : 'NO APTO'}
+                </h2>
+            `;
+
+           // Crear el contexto del gráfico
+const ctx = document.getElementById('resultsChart').getContext('2d');
+if (resultsChart) {
+    resultsChart.destroy();
+}
+
+// Crear gradientes
+const greenGradient = ctx.createLinearGradient(0, 0, 200, 0);
+greenGradient.addColorStop(0, '#4CAF50');    // Verde medio
+greenGradient.addColorStop(0.5, '#2E7D32');  // Verde oscuro
+greenGradient.addColorStop(1, '#1B5E20');    // Verde muy oscuro (forest green dark)
+
+// Crear gradiente rojo (de medio a muy oscuro)
+const redGradient = ctx.createLinearGradient(0, 0, 200, 0);
+redGradient.addColorStop(0, '#EF5350');    // Rojo medio
+redGradient.addColorStop(0.5, '#C62828');  // Rojo oscuro
+redGradient.addColorStop(1, '#B71C1C');    // Rojo muy oscuro (dark red)
+
+// Preparar datos con los nuevos gradientes
+const chartData = Object.values(scores.scales).map(scale => ({
+    name: scale.name,
+    score: scale.score,
+    color: scale.isApt ? greenGradient : redGradient
+}));
+
+// Crear gráfico con los nuevos colores
+resultsChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: chartData.map(d => d.name),
+        datasets: [{
+            label: 'Puntuación obtenida',
+            data: chartData.map(d => d.score),
+            backgroundColor: chartData.map(d => d.color),
+            borderColor: chartData.map(d => d.color),
+            borderWidth: 1,
+            barPercentage: 0.8
+        }, {
+                        label: 'Mínimo requerido/Rango válido',
+                        data: chartData.map(d => d.validRange ? d.validRange.min : d.minScore),
+                        type: 'line',
+                        borderColor: '#2196F3',
+                        borderDash: [5, 5],
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#e0e0e0'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Puntuación'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                afterBody: function(context) {
+                                    const index = context[0].dataIndex;
+                                    const scale = Object.values(scores.scales)[index];
+                                    const items = scale.items || {};
+                                    return [
+                                        '',
+                                        'Detalles:',
+                                        `Ítems directos: ${items.directas?.join(', ') || 'N/A'}`,
+                                        `Ítems inversos: ${items.inversas?.join(', ') || 'N/A'}`,
+                                        scale.validRange 
+                                            ? `Rango válido: ${scale.validRange.min}-${scale.validRange.max}`
+                                            : `Puntuación mínima: ${scale.minScore}`
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Mostrar resultados detallados por escala
+            const scaleResults = document.getElementById('scaleResults');
+            scaleResults.innerHTML = '<h2 class="text-xl font-bold mb-4">Resultados detallados por factor</h2>';
+            
+            // Crear las tarjetas de resultado para cada escala
+            Object.values(scores.scales).forEach(scale => {
+                const div = document.createElement('div');
+                div.className = 'result-item';
+                
+                // Calcular el percentil
+                const maxPossibleScore = (scale.items.directas.length + scale.items.inversas.length) * 3;
+                const percentil = Math.round((scale.score / maxPossibleScore) * 100);
+                
+                const requirement = scale.validRange 
+                    ? `Rango válido: ${scale.validRange.min}-${scale.validRange.max}`
+                    : `Mínimo requerido: ${scale.minScore}`;
+                
+                div.innerHTML = `
+                    <div class="scale-header">
+                        <h3 class="scale-name">${scale.name}</h3>
+                        <span class="status-badge ${scale.isApt ? 'apt' : 'not-apt'}">
+                            ${scale.isApt ? 'APTO' : 'NO APTO'}
+                        </span>
+                    </div>
+                    <div class="scale-details">
+                        <div class="score-info">
+                            <p>Puntuación: <strong>${scale.score}</strong></p>
+                            <p>${requirement}</p>
+                            <p>Percentil: <strong>${percentil}%</strong></p>
+                        </div>
+                        <div class="items-info">
+                            <p><strong>Ítems directos (${scale.items.directas.length}):</strong> ${scale.items.directas.join(', ')}</p>
+                            <p><strong>Ítems inversos (${scale.items.inversas.length}):</strong> ${scale.items.inversas.join(', ')}</p>
+                        </div>
+                        <div class="percentil-bar">
+                            <div class="percentil-fill" style="width: ${percentil}%"></div>
+                        </div>
+                    </div>
+                `;
+                scaleResults.appendChild(div);
+            });
+
+            // Mostrar tabla de revisión de respuestas
+            const answersTable = document.getElementById('answersTable');
+            answersTable.innerHTML = `
+                <table class="w-full mt-4 border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="border p-2">Nº</th>
+                            <th class="border p-2">Pregunta</th>
+                            <th class="border p-2">Respuesta</th>
+                            <th class="border p-2">Escalas Afectadas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${questions.map((question, index) => {
+                            const questionNumber = index + 1;
+                            const answer = answers[questionNumber];
+                            const affectedScales = getAffectedScales(questionNumber);
+                            
+                            return `
+                                <tr>
+                                    <td class="border p-2">${questionNumber}</td>
+                                    <td class="border p-2">${question}</td>
+                                    <td class="border p-2">${getAnswerText(answer)}</td>
+                                    <td class="border p-2">${affectedScales}</td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Inicializar el test cuando se carga la página
+        document.addEventListener('DOMContentLoaded', () => {
+            showQuestion();
+        });
+    </script>
+</body>
+</html>
