@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psicotécnicos Online - Mejora tus habilidades</title>
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --secondary-color: #2C3E50;
+            --accent-color: #27AE60;
+            --light-gray: #F5F6FA;
+            --text-color: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .tests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .test-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .test-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .test-image {
+            width: 100%;
+            height: 200px;
+            background-color: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--primary-color);
+        }
+
+        .test-content {
+            padding: 1.5rem;
+        }
+
+        .test-content h3 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .test-content p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .footer {
+            background-color: var(--secondary-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>JOSE ACADEMY 🤖</h1>
+        <p>Mejora tus habilidades matemáticas y cognitivas con nuestros tests interactivos de personalidad</p>
+    </header>
+
+    <div class="container">
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Práctica Personalizada</h3>
+                <p>Ejercicios adaptados a tu nivel y necesidades específicas</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Seguimiento Detallado</h3>
+                <p>Analiza tu progreso con estadísticas detalladas</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🏆</div>
+                <h3>Sistema de Logros</h3>
+                <p>Gana medallas y reconocimientos por tus avances</p>
+            </div>
+        </section>
+
+        <section class="tests-grid">
+            <div class="test-card">
+                <div class="test-image">✖️</div>
+                <div class="test-content">
+                    <h3>Juego de Multiplicar</h3>
+                    <p>Practica las tablas de multiplicar de forma divertida con diferentes niveles de dificultad.</p>
+                    <a href="multiplication-game-levels-fixed (1).html" class="btn">Comenzar</a>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <div class="test-image">%</div>
+                <div class="test-content">
+                    <h3>Juego de Porcentajes</h3>
+                    <p>Mejora tu habilidad para calcular porcentajes con ejercicios prácticos.</p>
+                    <a href="percentage-game.html" class="btn">Comenzar</a>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <div class="test-image">🧠</div>
+                <div class="test-content">
+                    <h3>Test TPT</h3>
+                    <p>Evalúa tus aptitudes y rasgos de personalidad con nuestro test profesional.</p>
+                    <a href="TPTweb.html" class="btn">Comenzar</a>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <div class="test-image">📝</div>
+                <div class="test-content">
+                    <h3>Test 16PF</h3>
+                    <p>Evaluación completa de 16 factores de personalidad con análisis detallado de resultados.</p>
+                    <a href="16pf1.html" class="btn">Comenzar</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; JOSE ACADEMY 🤖 2024. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>

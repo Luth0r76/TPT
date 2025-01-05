@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Multiplicar con Niveles</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .problem {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+        
+        input {
+            font-size: 20px;
+            padding: 10px;
+            width: 100px;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .lives {
+            color: red;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+        
+        .feedback {
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #eee;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #28a745;
+            transition: width 0.3s ease;
+        }
+
+        .level-badge {
+            position: relative;
+            display: inline-block;
+            padding: 5px 15px;
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            color: white;
+            border-radius: 15px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .medals {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .medal {
+            font-size: 24px;
+            filter: grayscale(100%);
+        }
+
+        .medal.earned {
+            filter: grayscale(0%);
+        }
+
+        .timer {
+            font-size: 18px;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .level-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Juego de Multiplicar</h1>
+        <div id="menu">
+            <h2>Elige una tabla de multiplicar:</h2>
+            <div class="buttons" id="tableButtons"></div>
+        </div>
+        <div id="game" style="display: none;">
+            <div class="level-badge">Nivel <span id="level">1</span></div>
+            <div class="stats">
+                <div class="lives">❤️❤️❤️</div>
+                <div>
+                    <div>Puntos: <span id="score">0</span></div>
+                    <div>Mejor: <span id="highScore">0</span></div>
+                </div>
+            </div>
+            <div class="timer" id="timer">Tiempo: 30s</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+            <div class="medals">
+                <span class="medal" id="medal1" title="Principiante: 10 respuestas correctas">🥉</span>
+                <span class="medal" id="medal2" title="Intermedio: 25 respuestas correctas">🥈</span>
+                <span class="medal" id="medal3" title="Experto: 50 respuestas correctas">🥇</span>
+                <span class="medal" id="medal4" title="Maestro: 100 respuestas correctas">👑</span>
+            </div>
+            <div class="problem" id="problem"></div>
+            <input type="number" id="answer" placeholder="Respuesta">
+            <br>
+            <button onclick="checkAnswer()">Comprobar</button>
+            <div class="feedback" id="feedback"></div>
+            <button onclick="showMenu()">Volver al Menú</button>
+        </div>
+    </div>
+
+    <script>
+        let currentTable = null;
+        let score = 0;
+        let highScore = 0;  // Ahora solo en memoria
+        let lives = 3;
+        let level = 1;
+        let currentProblem = null;
+        let usedProblems = new Set();
+        let timer = null;
+        let consecutiveCorrect = 0;
+        let totalCorrect = 0;
+
+        // Configuración de niveles
+        const LEVEL_CONFIG = {
+            1: { target: 5, time: 30, nextLevel: 2 },
+            2: { target: 8, time: 25, nextLevel: 3 },
+            3: { target: 10, time: 20, nextLevel: 4 },
+            4: { target: 12, time: 15, nextLevel: 5 },
+            5: { target: 15, time: 12, nextLevel: null }
+        };
+
+        const tableButtons = document.getElementById('tableButtons');
+        [0,1,2,3,4,5,6,7,8,9,'random'].forEach(number => {
+            const button = document.createElement('button');
+            button.textContent = number === 'random' ? 'Aleatorio' : `Tabla del ${number}`;
+            button.onclick = () => startGame(number);
+            tableButtons.appendChild(button);
+        });
+
+        function startTimer() {
+            clearInterval(timer);
+            let timeLeft = LEVEL_CONFIG[level].time;
+            
+            function updateTimer() {
+                document.getElementById('timer').textContent = `Tiempo: ${timeLeft}s`;
+            }
+            
+            updateTimer();
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        function handleTimeOut() {
+            lives--;
+            consecutiveCorrect = Math.max(0, consecutiveCorrect - 1);
+            updateDisplay();
+            if (lives <= 0) {
+                endGame(false);
+            } else {
+                const feedback = document.getElementById('feedback');
+                feedback.textContent = '¡Se acabó el tiempo! 😢';
+                feedback.style.color = 'red';
+                nextProblem();
+            }
+        }
+
+        function updateProgress() {
+            const currentLevelConfig = LEVEL_CONFIG[level];
+            const progress = (consecutiveCorrect / currentLevelConfig.target) * 100;
+            document.getElementById('progress').style.width = `${Math.min(progress, 100)}%`;
+            
+            const levelInfo = document.querySelector('.level-info');
+            if (!levelInfo) {
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'level-info';
+                document.querySelector('.progress-bar').after(infoDiv);
+            }
+            document.querySelector('.level-info').textContent = 
+                `${consecutiveCorrect}/${currentLevelConfig.target} para el siguiente nivel`;
+        }
+
+        function checkLevelUp() {
+            const currentLevelConfig = LEVEL_CONFIG[level];
+            if (consecutiveCorrect >= currentLevelConfig.target && currentLevelConfig.nextLevel) {
+                level = currentLevelConfig.nextLevel;
+                consecutiveCorrect = 0;
+                return true;
+            }
+            return false;
+        }
+
+        function updateMedals() {
+            const medals = {
+                medal1: 10,
+                medal2: 25,
+                medal3: 50,
+                medal4: 100
+            };
+
+            Object.entries(medals).forEach(([medalId, requirement]) => {
+                const medal = document.getElementById(medalId);
+                if (totalCorrect >= requirement) {
+                    medal.classList.add('earned');
+                }
+            });
+        }
+
+        function generateProblem() {
+            let multiplicand, multiplier;
+            let attempt = 0;
+            const maxAttempts = 100;
+
+            do {
+                if (currentTable === 'random') {
+                    multiplicand = Math.floor(Math.random() * 10);
+                    multiplier = Math.floor(Math.random() * 11);
+                } else {
+                    multiplicand = currentTable;
+                    multiplier = Math.floor(Math.random() * 11);
+                }
+                
+                attempt++;
+                if (attempt >= maxAttempts) return null;
+            } while (usedProblems.has(`${multiplicand}-${multiplier}`));
+
+            usedProblems.add(`${multiplicand}-${multiplier}`);
+            return {
+                multiplicand,
+                multiplier,
+                answer: multiplicand * multiplier
+            };
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseInt(document.getElementById('answer').value);
+            const feedback = document.getElementById('feedback');
+            const checkButton = document.querySelector('button');
+
+            if (!userAnswer && userAnswer !== 0) return;
+
+            if (userAnswer === currentProblem.answer) {
+                score++;
+                totalCorrect++;
+                consecutiveCorrect++;
+                feedback.textContent = '¡Correcto! 🎉';
+                feedback.style.color = 'green';
+                
+                if (score > highScore) {
+                    highScore = score;
+                    document.getElementById('highScore').textContent = highScore;
+                }
+
+                if (checkLevelUp()) {
+                    feedback.textContent = `¡Nivel ${level} desbloqueado! 🎉🌟`;
+                }
+
+                updateMedals();
+                nextProblem();
+            } else {
+                lives--;
+                consecutiveCorrect = Math.max(0, consecutiveCorrect - 1);
+                feedback.textContent = `¡Incorrecto! ${currentProblem.multiplicand} × ${currentProblem.multiplier} = ${currentProblem.answer} 😢`;
+                feedback.style.color = 'red';
+                
+                // Deshabilitar el botón y el input mientras se muestra la respuesta
+                checkButton.disabled = true;
+                document.getElementById('answer').disabled = true;
+                
+                // Detener el temporizador actual
+                clearInterval(timer);
+                
+                if (lives <= 0) {
+                    endGame(false);
+                    return;
+                }
+
+                // Esperar 2 segundos antes de continuar
+                setTimeout(() => {
+                    checkButton.disabled = false;
+                    document.getElementById('answer').disabled = false;
+                    nextProblem();
+                }, 2000);
+            }
+            updateDisplay();
+            updateProgress();
+        }
+
+        function startGame(table) {
+            currentTable = table;
+            score = 0;
+            lives = 3;
+            level = 1;
+            usedProblems.clear();
+            consecutiveCorrect = 0;
+            totalCorrect = 0;
+            updateDisplay();
+            updateProgress();
+            showGame();
+            nextProblem();
+        }
+
+        function nextProblem() {
+            clearInterval(timer);
+            currentProblem = generateProblem();
+            if (currentProblem === null) {
+                endGame(true);
+                return;
+            }
+            document.getElementById('problem').textContent = 
+                `${currentProblem.multiplicand} × ${currentProblem.multiplier} = ?`;
+            document.getElementById('answer').value = '';
+            document.getElementById('feedback').textContent = '';
+            startTimer();
+            document.getElementById('answer').focus();
+        }
+
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.querySelector('.lives').textContent = '❤️'.repeat(lives);
+            document.getElementById('highScore').textContent = highScore;
+            updateProgress();
+        }
+
+        function endGame(completed) {
+            clearInterval(timer);
+            const message = completed 
+                ? `¡Felicidades! Has completado ${currentTable === 'random' ? 'el modo aleatorio' : 'la tabla'} con ${score} puntos!` 
+                : `Juego terminado. Puntuación final: ${score}`;
+            document.getElementById('feedback').textContent = message;
+            setTimeout(showMenu, 3000);
+        }
+
+        function showGame() {
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('game').style.display = 'block';
+            document.getElementById('answer').focus();
+        }
+
+        function showMenu() {
+            clearInterval(timer);
+            document.getElementById('menu').style.display = 'block';
+            document.getElementById('game').style.display = 'none';
+        }
+
+        document.getElementById('answer').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+    </script>
+</body>
+</html>

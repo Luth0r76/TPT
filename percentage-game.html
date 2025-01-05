@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Porcentajes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .problem {
+            font-size: 24px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        input {
+            font-size: 20px;
+            padding: 10px;
+            width: 100px;
+            text-align: center;
+            margin: 10px 0;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+        }
+        
+        .lives {
+            color: red;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+        
+        .feedback {
+            margin: 10px 0;
+            font-weight: bold;
+            min-height: 24px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .hint {
+            font-size: 14px;
+            color: #666;
+            margin: 10px 0;
+            font-style: italic;
+        }
+
+        .timer {
+            font-size: 18px;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .medal {
+            font-size: 24px;
+            margin: 0 5px;
+            filter: grayscale(100%);
+        }
+
+        .medal.earned {
+            filter: grayscale(0%);
+        }
+
+        .medals {
+            margin: 10px 0;
+        }
+
+        .tip {
+            background-color: #e8f5e9;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 14px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculador de Porcentajes</h1>
+        <div id="menu">
+            <h2>Elige un nivel:</h2>
+            <div class="buttons">
+                <button onclick="startGame('easy')">Fácil (10%, 25%, 50%)</button>
+                <button onclick="startGame('medium')">Medio (20%, 75%, 30%)</button>
+                <button onclick="startGame('hard')">Difícil (40%, 60%, 80%)</button>
+                <button onclick="startGame('master')">Maestro (Aleatorio)</button>
+            </div>
+        </div>
+        <div id="game" style="display: none;">
+            <div class="stats">
+                <div class="lives">❤️❤️❤️</div>
+                <div>
+                    <div>Puntos: <span id="score">0</span></div>
+                    <div>Mejor: <span id="highScore">0</span></div>
+                </div>
+            </div>
+            <div class="medals">
+                <span class="medal" id="medal1" title="Principiante: 5 correctas">🥉</span>
+                <span class="medal" id="medal2" title="Intermedio: 10 correctas">🥈</span>
+                <span class="medal" id="medal3" title="Experto: 20 correctas">🥇</span>
+                <span class="medal" id="medal4" title="Maestro: 30 correctas">👑</span>
+            </div>
+            <div class="timer" id="timer">Tiempo: 30s</div>
+            <div class="problem" id="problem"></div>
+            <div class="hint" id="hint"></div>
+            <div class="tip" id="tip"></div>
+            <input type="number" id="answer" placeholder="Respuesta">
+            <br>
+            <button onclick="checkAnswer()">Comprobar</button>
+            <button onclick="showTip()">Pista</button>
+            <div class="feedback" id="feedback"></div>
+            <button onclick="showMenu()">Volver al Menú</button>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let highScore = 0;
+        let lives = 3;
+        let currentProblem = null;
+        let timer = null;
+        let currentLevel = null;
+        let totalCorrect = 0;
+
+        const LEVELS = {
+            easy: {
+                percentages: [10, 25, 50],
+                time: 30,
+                numbers: [100, 200, 400, 1000]
+            },
+            medium: {
+                percentages: [20, 75, 30],
+                time: 25,
+                numbers: [100, 200, 400, 1000]
+            },
+            hard: {
+                percentages: [40, 60, 80],
+                time: 20,
+                numbers: [50, 150, 250, 500]
+            },
+            master: {
+                percentages: [10, 20, 25, 30, 40, 50, 60, 75, 80],
+                time: 15,
+                numbers: [50, 100, 150, 200, 250, 400, 500, 1000]
+            }
+        };
+
+        const TIPS = {
+            10: "10% es dividir entre 10",
+            20: "20% es dividir entre 5",
+            25: "25% es dividir entre 4",
+            30: "30% es dividir entre 10 y multiplicar por 3",
+            40: "40% es dividir entre 10 y multiplicar por 4",
+            50: "50% es dividir entre 2",
+            60: "60% es dividir entre 10 y multiplicar por 6",
+            75: "75% es dividir entre 4 y multiplicar por 3",
+            80: "80% es dividir entre 5 y multiplicar por 4"
+        };
+
+        function generateProblem() {
+            const level = LEVELS[currentLevel];
+            const percentage = level.percentages[Math.floor(Math.random() * level.percentages.length)];
+            const number = level.numbers[Math.floor(Math.random() * level.numbers.length)];
+            return {
+                percentage,
+                number,
+                answer: (percentage * number) / 100
+            };
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            let timeLeft = LEVELS[currentLevel].time;
+            
+            function updateTimer() {
+                document.getElementById('timer').textContent = `Tiempo: ${timeLeft}s`;
+            }
+            
+            updateTimer();
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        function handleTimeOut() {
+            lives--;
+            updateDisplay();
+            if (lives <= 0) {
+                endGame();
+            } else {
+                const feedback = document.getElementById('feedback');
+                feedback.textContent = '¡Se acabó el tiempo! 😢';
+                feedback.style.color = 'red';
+                nextProblem();
+            }
+        }
+
+        function updateMedals() {
+            const medals = {
+                medal1: 5,
+                medal2: 10,
+                medal3: 20,
+                medal4: 30
+            };
+
+            Object.entries(medals).forEach(([medalId, requirement]) => {
+                const medal = document.getElementById(medalId);
+                if (totalCorrect >= requirement) {
+                    medal.classList.add('earned');
+                }
+            });
+        }
+
+        function showTip() {
+            const tip = document.getElementById('tip');
+            tip.style.display = 'block';
+            tip.textContent = TIPS[currentProblem.percentage];
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseInt(document.getElementById('answer').value);
+            const feedback = document.getElementById('feedback');
+
+            if (!userAnswer && userAnswer !== 0) return;
+
+            if (Math.abs(userAnswer - currentProblem.answer) <= 1) { // Permitimos un margen de error de ±1
+                score++;
+                totalCorrect++;
+                feedback.textContent = '¡Correcto! 🎉';
+                feedback.style.color = 'green';
+                
+                if (score > highScore) {
+                    highScore = score;
+                    document.getElementById('highScore').textContent = highScore;
+                }
+
+                updateMedals();
+                nextProblem();
+            } else {
+                lives--;
+                feedback.textContent = `¡Incorrecto! El ${currentProblem.percentage}% de ${currentProblem.number} es ${currentProblem.answer} 😢`;
+                feedback.style.color = 'red';
+                
+                if (lives <= 0) {
+                    endGame();
+                    return;
+                }
+
+                setTimeout(nextProblem, 3000);
+            }
+            updateDisplay();
+        }
+
+        function startGame(level) {
+            currentLevel = level;
+            score = 0;
+            lives = 3;
+            totalCorrect = 0;
+            updateDisplay();
+            showGame();
+            nextProblem();
+        }
+
+        function nextProblem() {
+            clearInterval(timer);
+            currentProblem = generateProblem();
+            document.getElementById('problem').textContent = 
+                `¿Cuánto es el ${currentProblem.percentage}% de ${currentProblem.number}?`;
+            document.getElementById('answer').value = '';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('tip').style.display = 'none';
+            
+            // Mostrar pista según el nivel
+            const hint = document.getElementById('hint');
+            if (currentLevel === 'easy') {
+                hint.textContent = `Recuerda: para calcular un porcentaje, multiplica el número por el porcentaje y divide entre 100`;
+            } else {
+                hint.textContent = '';
+            }
+            
+            startTimer();
+            document.getElementById('answer').focus();
+        }
+
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.querySelector('.lives').textContent = '❤️'.repeat(lives);
+            document.getElementById('highScore').textContent = highScore;
+        }
+
+        function endGame() {
+            clearInterval(timer);
+            const message = `Juego terminado. Puntuación final: ${score}`;
+            document.getElementById('feedback').textContent = message;
+            setTimeout(showMenu, 3000);
+        }
+
+        function showGame() {
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('game').style.display = 'block';
+        }
+
+        function showMenu() {
+            clearInterval(timer);
+            document.getElementById('menu').style.display = 'block';
+            document.getElementById('game').style.display = 'none';
+        }
+
+        document.getElementById('answer').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+    </script>
+</body>
+</html>
