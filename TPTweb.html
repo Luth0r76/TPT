@@ -112,24 +112,30 @@
             border-color: #2b6cb0;
         }
 
-        /* Botones de navegación */
-        .start-button, .next-button {
+       /* Botones de navegación */
+.start-button, .next-button {
     display: block;
     width: 200px;
     margin: 20px auto;
     padding: 12px 24px;
     font-size: 1.2em;
-    background: linear-gradient(90deg, #3B82F6 0%, #1E40AF 100%);  /* Gradiente azul */
+    background: linear-gradient(90deg, #3B82F6 0%, #1E40AF 100%);
     color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s ease;  /* Cambiado a 'all' para que afecte al gradiente */
+    transition: all 0.3s ease;
 }
 
-        .start-button:hover, .next-button:hover {
-            background-color: #3182ce;
-        }
+.next-button:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+}
+
+.start-button:hover, .next-button:hover:not(:disabled) {
+    background: linear-gradient(90deg, #2563EB 0%, #1E3A8A 100%);
+    transform: translateY(-2px);
+}
 
         /* Barra de progreso */
         .progress-bar {
@@ -293,20 +299,11 @@
             <button class="next-button" onclick="nextQuestion()" disabled>Siguiente</button>
         </div>
 
+        
         <!-- Página de resultados -->
-        <div id="resultsPage" class="results-page">
-            <h1>Resultados del Test</h1>
-            <div id="generalResult"></div>
-            <div class="chart-container">
-                <canvas id="resultsChart"></canvas>
-            </div>
-            <div id="scaleResults"></div>
-            <div id="answersReview" class="mt-8">
-                <h2>Revisión de Respuestas</h2>
-                <div id="answersTable"></div>
-            </div>
-        </div>
-    </div>
+<div id="resultsPage" class="results-page">
+    <div id="resultsContainer"></div>
+</div>
 
     <script>
         // Array de preguntas del test
@@ -477,8 +474,20 @@
         let currentQuestion = 0;  // Pregunta actual
         const answers = {};       // Almacena las respuestas del usuario
         let resultsChart = null;  // Referencia al gráfico de resultados
+        
         // Definición de escalas y sus propiedades
         const scales = {
+            sinceridad: {
+                name: "Sinceridad",
+                validRange: { min: 17, max: 22 },
+                directas: {A: 0, B: 1, C: 2, D: 3},
+                inversas: {A: 3, B: 2, C: 1, D: 0},
+                items: {
+                    directas: [49, 57, 97, 99, 136, 149],
+                    inversas: [12, 18, 71, 141],
+                }
+            },
+            
             desajuste: {
                 name: "Desajuste",
                 validRange: { min: 0, max: 2 },
@@ -676,20 +685,27 @@
 
         // Función para seleccionar una opción de respuesta
         function selectOption(option) {
-            const buttons = document.querySelectorAll('.option-button');
-            buttons.forEach(button => button.classList.remove('selected'));
-            
-            const selectedButton = Array.from(buttons).find(
-                button => button.textContent.startsWith(option)
-            );
-            if (selectedButton) {
-                selectedButton.classList.add('selected');
-            }
-            
-            // Guardar la respuesta y habilitar el botón siguiente
-            answers[currentQuestion + 1] = option;
-            document.querySelector('.next-button').disabled = false;
-        }
+    // Limpiar selección previa
+    const buttons = document.querySelectorAll('.option-button');
+    buttons.forEach(button => button.classList.remove('selected'));
+    
+    // Seleccionar nuevo botón
+    const selectedButton = Array.from(buttons).find(
+        button => button.textContent.startsWith(option)
+    );
+    if (selectedButton) {
+        selectedButton.classList.add('selected');
+    }
+    
+    // Guardar la respuesta
+    answers[currentQuestion + 1] = option;
+    
+    // Habilitar el botón siguiente
+    const nextButton = document.querySelector('.next-button');
+    if (nextButton) {
+        nextButton.disabled = false;
+    }
+}
 
         // Función para avanzar a la siguiente pregunta
         function nextQuestion() {
@@ -773,46 +789,121 @@
             return affectedScales.join(', ') || 'Ninguna';
         }
 
-        // Función principal para mostrar los resultados
-        function showResults() {
-            document.getElementById('questionPage').style.display = 'none';
-            document.getElementById('resultsPage').style.display = 'block';
-            
-            const scores = calculateScores();
-            
-            // Mostrar resultado general (APTO/NO APTO)
-            const generalResult = document.getElementById('generalResult');
-            generalResult.className = `general-result ${scores.generalAptitude ? 'apt' : 'not-apt'}`;
-            generalResult.innerHTML = `
-                <h2 style="font-size: 2em; margin: 20px 0;">
+// Reemplaza la función showResults() existente con esta nueva versión
+function showResults() {
+    document.getElementById('questionPage').style.display = 'none';
+    document.getElementById('resultsPage').style.display = 'block';
+    
+    const scores = calculateScores();
+    const resultsContainer = document.getElementById('resultsContainer');
+    
+    // Mostrar resultado general
+    let html = `
+        <h2>Resultados del Test</h2>
+        <div class="scale-result">
+            <h3>Resumen General</h3>
+            <div style="margin-bottom: 10px;">
+                <strong>Estado: </strong>
+                <span style="color: ${scores.generalAptitude ? 'green' : 'red'}; font-weight: bold;">
                     ${scores.generalAptitude ? 'APTO' : 'NO APTO'}
-                </h2>
-            `;
+                </span>
+            </div>
+        </div>
+    `;
 
-           // Crear el contexto del gráfico
-const ctx = document.getElementById('resultsChart').getContext('2d');
-if (resultsChart) {
-    resultsChart.destroy();
+    // Mostrar resultados de cada escala
+    Object.entries(scores.scales).forEach(([key, scale]) => {
+        const validRangeText = scale.validRange 
+            ? `Entre ${scale.validRange.min} y ${scale.validRange.max}`
+            : `Mayor a ${scale.minScore}`;
+
+        let responsesHTML = `
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                <thead>
+                    <tr style="background-color: #f0f0f0;">
+                        <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Nº Pregunta</th>
+                        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Pregunta</th>
+                        <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Respuesta</th>
+                        <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Puntos</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        // Agregar ítems directos
+        scale.items.directas.forEach(itemNum => {
+            const response = answers[itemNum];
+            const points = response ? scales[key].directas[response] : 0;
+            responsesHTML += `
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${itemNum}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${questions[itemNum - 1]}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${getAnswerText(response)}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${points}</td>
+                </tr>
+            `;
+        });
+
+        // Agregar ítems inversos
+        scale.items.inversas.forEach(itemNum => {
+            const response = answers[itemNum];
+            const points = response ? scales[key].inversas[response] : 0;
+            responsesHTML += `
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${itemNum}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${questions[itemNum - 1]}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${getAnswerText(response)}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${points}</td>
+                </tr>
+            `;
+        });
+
+        responsesHTML += `
+                </tbody>
+                <tfoot>
+                    <tr style="background-color: ${scale.isApt ? '#e6ffe6' : '#ffe6e6'};">
+                        <td colspan="3" style="padding: 8px; border: 1px solid #ddd; text-align: right;"><strong>Puntuación Total:</strong></td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><strong>${scale.score}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        `;
+
+        html += `
+            <div class="scale-result">
+                <div class="scale-header">
+                    <span class="scale-name">${scale.name}</span>
+                    <span class="scale-score" style="color: ${scale.isApt ? 'green' : 'red'}">
+                        Puntuación: ${scale.score}
+                    </span>
+                </div>
+                <div class="scale-status ${scale.isApt ? 'valid' : 'invalid'}">
+                    ${scale.isApt ? 'DENTRO DEL RANGO' : 'FUERA DEL RANGO'}
+                </div>
+                <div class="scale-details">
+                    <p>Rango esperado: ${validRangeText}</p>
+                    <div style="margin-top: 10px;">
+                        <strong>Detalle de respuestas:</strong>
+                        ${responsesHTML}
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    resultsContainer.innerHTML = html;
 }
 
-// Crear gradientes
-const greenGradient = ctx.createLinearGradient(0, 0, 200, 0);
-greenGradient.addColorStop(0, '#4CAF50');    // Verde medio
-greenGradient.addColorStop(0.5, '#2E7D32');  // Verde oscuro
-greenGradient.addColorStop(1, '#1B5E20');    // Verde muy oscuro (forest green dark)
-
-// Crear gradiente rojo (de medio a muy oscuro)
-const redGradient = ctx.createLinearGradient(0, 0, 200, 0);
-redGradient.addColorStop(0, '#EF5350');    // Rojo medio
-redGradient.addColorStop(0.5, '#C62828');  // Rojo oscuro
-redGradient.addColorStop(1, '#B71C1C');    // Rojo muy oscuro (dark red)
-
-// Preparar datos con los nuevos gradientes
-const chartData = Object.values(scores.scales).map(scale => ({
-    name: scale.name,
-    score: scale.score,
-    color: scale.isApt ? greenGradient : redGradient
-}));
+// Función auxiliar para obtener el texto de la respuesta
+function getAnswerText(answer) {
+    const answerTexts = {
+        'A': 'Casi nunca',
+        'B': 'A veces',
+        'C': 'Con frecuencia',
+        'D': 'Casi siempre'
+    };
+    return answerTexts[answer] || 'Sin respuesta';
+}
 
 // Crear gráfico con los nuevos colores
 resultsChart = new Chart(ctx, {
@@ -954,7 +1045,7 @@ resultsChart = new Chart(ctx, {
                     </tbody>
                 </table>
             `;
-        }
+        
 
         // Inicializar el test cuando se carga la página
         document.addEventListener('DOMContentLoaded', () => {
