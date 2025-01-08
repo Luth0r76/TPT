@@ -4,227 +4,311 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test 16PF</title>
+   
     <style>
-        /* Reset básico de CSS */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+   /* Reset básico de CSS */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-        /* Estilos generales del cuerpo */
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            padding: 20px;
-            background-color: #f0f2f5;
-        }
+/* Estilos generales del cuerpo */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    padding: 20px;
+    background-color: #f0f2f5;
+}
 
-        /* Contenedor principal */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            min-height: 500px;
-        }
+/* Contenedor principal */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-height: 500px;
+}
 
-        /* Páginas del test */
-        .page {
-            padding: 20px;
-            display: none;
-        }
+/* Páginas del test */
+.page {
+    padding: 20px;
+    display: none;
+}
 
-        .page.active {
-            display: block;
-        }
+.page.active {
+    display: block;
+}
 
-        .intro-page {
-            text-align: center;
-        }
+.intro-page {
+    text-align: center;
+}
 
-        /* Encabezados y textos */
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #1a365d;
-        }
+/* Encabezados y textos */
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #1a365d;
+}
 
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #000000;
-        }
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #000000;
+}
 
-        .instructions {
-            text-align: left;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #f8fafc;
-            border-radius: 8px;
-            max-width: 600px;
-        }
+h3 {
+    margin-bottom: 15px;
+    color: #2d3748;
+}
 
-        /* Elementos de las preguntas */
-        .question-number {
-            font-size: 1.2em;
-            color: #4a5568;
-            margin-bottom: 10px;
-        }
+h4 {
+    text-align: center;
+    color: #2d3748;
+    margin-bottom: 20px;
+}
 
-        .question-text {
-            font-size: 1.3em;
-            margin-bottom: 30px;
-            line-height: 1.4;
-            font-weight: 600;
-        }
+.instructions {
+    text-align: left;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    max-width: 600px;
+}
 
-        /* Contenedor de opciones */
-        .options-container {
-            display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+/* Elementos de las preguntas */
+.question-number {
+    font-size: 1.2em;
+    color: #4a5568;
+    margin-bottom: 10px;
+}
 
-        /* Botones de opción */
-        .option-button {
-            padding: 15px 20px;
-            font-size: 1.1em;
-            background-color: #edf2f7;
-            border: 2px solid #cbd5e0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: left;
-        }
+.question-text {
+    font-size: 1.3em;
+    margin-bottom: 30px;
+    line-height: 1.4;
+    font-weight: 600;
+}
 
-        .option-button:hover {
-            background-color: #e2e8f0;
-            transform: translateY(-2px);
-        }
+/* Contenedor de opciones */
+.options-container {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
 
-        .option-button.selected {
-            background-color: #4299e1;
-            color: white;
-            border-color: #2b6cb0;
-        }
+/* Botones de opción */
+.option-button {
+    padding: 15px 20px;
+    font-size: 1.1em;
+    background-color: #edf2f7;
+    border: 2px solid #cbd5e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+}
 
-        /* Botones de navegación */
-        .start-button, .nav-button {
-            display: block;
-            width: 200px;
-            margin: 20px auto;
-            padding: 12px 24px;
-            font-size: 1.2em;
-            background: linear-gradient(90deg, #3B82F6 0%, #1E40AF 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+.option-button:hover {
+    background-color: #e2e8f0;
+    transform: translateY(-2px);
+}
 
-        .start-button:hover, .nav-button:hover {
-            background-color: #3182ce;
-        }
+.option-button.selected {
+    background-color: #4299e1;
+    color: white;
+    border-color: #2b6cb0;
+}
 
-        .nav-button:disabled {
-            background: #cbd5e0;
-            cursor: not-allowed;
-        }
+/* Botones de navegación */
+.start-button, .nav-button {
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    padding: 12px 24px;
+    font-size: 1.2em;
+    background: linear-gradient(90deg, #3B82F6 0%, #1E40AF 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
 
-        /* Barra de progreso */
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background-color: #e2e8f0;
-            border-radius: 5px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
+.start-button:hover, .nav-button:hover {
+    background-color: #3182ce;
+    transform: translateY(-1px);
+}
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #3B82F6 0%, #1E40AF 100%);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
+.nav-button:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+    transform: none;
+}
 
-        /* Estilos para los resultados */
-        .scale-result {
-            background-color: #f8fafc;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-        }
+/* Barra de progreso */
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: #e2e8f0;
+    border-radius: 5px;
+    margin: 20px 0;
+    overflow: hidden;
+}
 
-        .scale-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3B82F6 0%, #1E40AF 100%);
+    width: 0%;
+    transition: width 0.3s ease;
+}
 
-        .scale-name {
-            font-weight: bold;
-        }
+/* Estilos específicos del modo training */
+.scale-selector {
+    padding: 20px;
+    text-align: center;
+}
 
-        .scale-score {
-            font-size: 1.1em;
-            color: #2b6cb0;
-        }
+.scales-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
 
-        .scale-status {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.9em;
-            font-weight: bold;
-        }
+.scale-button {
+    background-color: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: left;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    height: auto;
+}
 
-        .scale-status.valid {
-            background-color: #c6f6d5;
-            color: #22543d;
-        }
+.scale-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-color: #3B82F6;
+}
 
-        .scale-status.invalid {
-            background-color: #fed7d7;
-            color: #742a2a;
-        }
+.scale-button h5 {
+    margin: 0 0 10px 0;
+    font-size: 1.1em;
+    color: #2b6cb0;
+}
 
-        .scale-details {
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #4a5568;
-        }
+.scale-button p {
+    margin: 0;
+    font-size: 0.9em;
+    color: #4a5568;
+}
 
-        /* Tabla de respuestas */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
+/* Estilos para los resultados */
+.scale-result {
+    background-color: #f8fafc;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+}
 
-        th, td {
-            padding: 8px;
-            border: 1px solid #ddd;
-        }
+.scale-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
 
-        th {
-            background-color: #f0f0f0;
-            text-align: center;
-        }
+.scale-name {
+    font-weight: bold;
+}
 
-        td {
-            text-align: left;
-        }
+.scale-score {
+    font-size: 1.1em;
+    color: #2b6cb0;
+}
 
-        tfoot tr {
-            font-weight: bold;
-        }
-    </style>
+.scale-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+.scale-status.valid {
+    background-color: #c6f6d5;
+    color: #22543d;
+}
+
+.scale-status.invalid {
+    background-color: #fed7d7;
+    color: #742a2a;
+}
+
+.scale-details {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #4a5568;
+}
+
+/* Resultados del training */
+.training-results {
+    padding: 20px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.result-item {
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.result-score {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.result-valid {
+    color: #22c55e;
+}
+
+.result-invalid {
+    color: #ef4444;
+}
+
+/* Tabla de respuestas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+
+tfoot tr {
+    font-weight: bold;
+    background-color: #f8fafc;
+}
+   </style>
 </head>
 <body>
     <div class="container">
@@ -263,127 +347,382 @@
             <h2>Resultados del Test</h2>
             <div id="resultsContainer"></div>
         </div>
+
+        <!-- Página de entrenamiento (modo training) -->
+        <div id="trainingPage" class="page">
+            <h2>JOSE ACADEMY 🤖</h2>
+            <h3>Modo Entrenamiento - Test 16PF</h3>
+            
+            <!-- Selector de escalas -->
+            <div id="scaleSelector" class="scale-selector">
+                <h4>Selecciona una escala para practicar:</h4>
+                <div class="scales-grid">
+                    <button class="scale-button" onclick="selectScale('sinceridad')">
+                        <h5>Sinceridad</h5>
+                        <p>Evalúa la honestidad y transparencia en las respuestas</p>
+                    </button>
+                    <button class="scale-button" onclick="selectScale('afabilidad')">
+                        <h5>Afabilidad</h5>
+                        <p>Mide la calidez y disposición hacia los demás</p>
+                    </button>
+                    <button class="scale-button" onclick="selectScale('estabilidadEmocional')">
+                        <h5>Estabilidad Emocional</h5>
+                        <p>Evalúa el equilibrio emocional y la adaptabilidad</p>
+                    </button>
+                    <button class="scale-button" onclick="selectScale('dominancia')">
+                        <h5>Dominancia</h5>
+                        <p>Evalúa la asertividad y el control</p>
+                    </button>
+                    <button class="scale-button" onclick="selectScale('animacion')">
+                        <h5>Animación</h5>
+                        <p>Mide la expresividad y el entusiasmo</p>
+                    </button>
+                    <button class="scale-button" onclick="selectScale('atencionNormas')">
+                        <h5>Atención a las Normas</h5>
+                        <p>Evalúa el respeto por las reglas y el orden</p>
+                    </button>
+                    <button class="scale-button" onclick="selectScale('atrevimiento')">
+                        <h5>Atrevimiento</h5>
+                        <p>Mide la seguridad social y la audacia</p>
+                    </button>
+                    <button class="scale-button" onclick="selectScale('sensibilidad')">
+                        <h5>Sensibilidad</h5>
+                        <p>Evalúa la empatía y la sensibilidad emocional</p>
+                    </button>
+                    <button class="scale-button" onclick="selectScale('vigilancia')">
+                        <h5>Vigilancia</h5>
+                        <p>Mide la confianza y la suspicacia</p>
+                    </button>
+                    <button class="scale-button" onclick="selectScale('abstraccion')">
+                        <h5>Abstracción</h5>
+                        <p>Evalúa el pensamiento abstracto vs práctico</p>
+                    </button>
+                    <button class="scale-button" onclick="selectScale('privacidad')">
+                        <h5>Privacidad</h5>
+                        <p>Mide la apertura personal</p>
+                    </button>
+                    <button class="scale-button" onclick="selectScale('apresion')">
+                        <h5>Aprensión</h5>
+                        <p>Evalúa la preocupación y la inseguridad</p>
+                    </button>
+                    <button class="scale-button" onclick="selectScale('aperturaCambio')">
+                        <h5>Apertura al Cambio</h5>
+                        <p>Mide la flexibilidad y la innovación</p>
+                    </button>
+                    <button class="scale-button" onclick="selectScale('autosuficiencia')">
+                        <h5>Autosuficiencia</h5>
+                        <p>Evalúa la independencia</p>
+                    </button>
+                    <button class="scale-button" onclick="selectScale('perfeccionismo')">
+                        <h5>Perfeccionismo</h5>
+                        <p>Mide la organización y la disciplina</p>
+                    </button>
+                    <button class="scale-button" onclick="selectScale('tension')">
+                        <h5>Tensión</h5>
+                        <p>Evalúa la impaciencia y la tensión nerviosa</p>
+                    </button>
+                </div>
+            </div>
+            <!-- Página de preguntas del entrenamiento -->
+            <div id="trainingQuestionPage" style="display: none;">
+                <div class="progress-bar">
+                    <div id="trainingProgressFill" class="progress-fill"></div>
+                </div>
+                <div id="trainingQuestionNumber" class="question-number"></div>
+                <div id="trainingQuestionText" class="question-text"></div>
+                <div id="trainingOptionsContainer" class="options-container"></div>
+                <button class="nav-button" id="trainingNextButton" onclick="nextTrainingQuestion()" disabled>Siguiente</button>
+                <button class="nav-button" onclick="backToScaleSelection()">Cambiar Escala</button>
+            </div>
+
+            <!-- Página de resultados del entrenamiento -->
+            <div id="trainingResultsPage" style="display: none;">
+                <h3>Resultados del Entrenamiento</h3>
+                <div id="trainingResultsContainer" class="training-results"></div>
+                <button class="nav-button" onclick="backToScaleSelection()">Practicar Otra Escala</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Configuración de escalas
-        const scales = {
-            sinceridad: {
-                name: "Sinceridad",
-                questions: [23,34,48,58,75,85,95,101,115,144,153],
-                validRange: { min: 8, max: 19 }
-            },
-            afabilidad: {
-                name: "Afabilidad",
-                questions: [1,31,33,63,65,96,98,127,129,159,161],
-                validRange: { min: 18, max: Infinity }
-            },
-            estabilidadEmocional: {
-                name: "Estabilidad Emocional",
-                questions: [2,32,35,64,67,97,128,131,160,162],
-                validRange: { min: 20, max: Infinity }
-            },
-            dominancia: {
-                name: "Dominancia",
-                questions: [3,36,38,66,99,102,130,132,163,165],
-                validRange: { min: 14, max: 16 }
-            },
-            animacion: {
-                name: "Animación",
-                questions: [4,6,37,39,68,70,100,103,133,134,164],
-                validRange: { min: 14, max: 16 }
-            },
-            atencionNormas: {
-                name: "Atención a las Normas",
-                questions: [5,7,40,69,72,104,106,136,166,168],
-                validRange: { min: 20, max: Infinity }
-            },
-            atrevimiento: {
-                name: "Atrevimiento",
-                questions: [9,41,71,73,105,107,135,137,167,169],
-                validRange: { min: 20, max: Infinity }
-            },
-            sensibilidad: {
-                name: "Sensibilidad",
-                questions: [8,10,42,44,74,77,108,110,138,140,170],
-                validRange: { min: 7, max: 10 }
-            },
-            vigilancia: {
-                name: "Vigilancia",
-                questions: [11,13,43,45,76,78,109,112,139,141],
-                validRange: { min: 0, max: Infinity }
-            },
-            abstraccion: {
-                name: "Abstracción",
-                questions: [12,14,17,46,49,79,91,111,114,142,145],
-                validRange: { min: 0, max: 2 }
-            },
-            privacidad: {
-                name: "Privacidad",
-                questions: [15,18,47,50,80,84,113,117,143,148],
-                validRange: { min: 7, max: 13 }
-            },
-            apresion: {
-                name: "Aprensión",
-                questions: [19,21,51,54,82,87,116,119,146,150],
-                validRange: { min: 0, max: 5 }
-            },
-            aperturaCambio: {
-                name: "Apertura al Cambio",
-                questions: [20,22,24,52,53,55,83,86,88,118,120,147,149,151],
-                validRange: { min: 13, max: Infinity }
-            },
-            autosuficiencia: {
-                name: "Autosuficiencia",
-                questions: [25,27,56,59,89,92,121,123,152,156],
-                validRange: { min: 0, max: 4 }
-            },
-            perfeccionismo: {
-                name: "Perfeccionismo",
-                questions: [26,29,57,61,90,93,122,125,154,157],
-                validRange: { min: 18, max: 20 }
-            },
-            tension: {
-                name: "Tensión",
-                questions: [28,30,60,62,91,94,124,126,155,158],
-                validRange: { min: 0, max: 2 }
-            }
-        };
+        // Variables globales para el modo entrenamiento
+let currentTrainingScale = null;
+let currentTrainingQuestion = 0;
+let trainingAnswers = {};
 
-        // Configuración de puntuaciones (valores que valen 2 puntos)
-        const twoPointAnswers = {
-            "2": "A", "32": "C", "35": "C", "64": "A", "67": "C", "97": "A", "128": "A",
-            "131": "C", "160": "A", "162": "A", "9": "A", "41": "C", "71": "C", "73": "A",
-            "105": "C", "107": "C", "135": "A", "137": "A", "167": "C", "169": "C", "3": "A",
-            "36": "A", "38": "A", "66": "A", "99": "A", "102": "C", "130": "A", "132": "A",
-            "163": "C", "165": "A", "8": "C", "10": "A", "42": "A", "44": "A", "74": "A",
-            "77": "A", "108": "A", "110": "C", "138": "C", "140": "C", "170": "C", "16": "C",
-            "23": "C", "34": "C", "48": "C", "58": "C", "75": "C", "85": "C", "95": "C",
-            "101": "C", "115": "C", "144": "C", "153": "A", "11": "C", "13": "A", "43": "A",
-            "45": "C", "76": "A", "78": "C", "109": "C", "112": "A", "139": "C", "141": "A",
-            "1": "C", "31": "A", "33": "A", "63": "C", "65": "C", "96": "A", "98": "C",
-            "127": "A", "129": "C", "159": "A", "161": "A", "12": "A", "14": "A", "17": "C",
-            "46": "C", "49": "C", "79": "A", "81": "C", "111": "A", "114": "C", "142": "A",
-            "145": "A", "4": "A", "6": "C", "37": "C", "39": "A", "68": "A", "70": "C",
-            "100": "A", "103": "A", "133": "A", "134": "A", "164": "C", "15": "C", "18": "C",
-            "47": "A", "50": "A", "80": "A", "84": "C", "113": "A", "117": "C", "143": "A",
-            "148": "A", "5": "A", "7": "A", "40": "A", "69": "A", "72": "C", "104": "A",
-            "106": "C", "136": "C", "166": "C", "168": "A", "19": "C", "21": "C", "51": "A",
-            "54": "A", "82": "C", "87": "A", "116": "A", "119": "C", "146": "A", "150": "A",
-            "26": "C", "29": "C", "57": "C", "61": "A", "90": "C", "93": "A", "122": "C",
-            "125": "A", "154": "C", "157": "A", "25": "C", "27": "A", "56": "C", "59": "A",
-            "89": "A", "92": "C", "121": "A", "123": "C", "152": "A", "156": "C", "28": "A",
-            "30": "A", "60": "C", "62": "A", "91": "C", "94": "C", "124": "C", "126": "A",
-            "155": "A", "158": "A", "20": "A", "22": "A", "24": "C", "52": "C", "53": "A",
-            "55": "C", "83": "A", "86": "C", "88": "A", "118": "A", "120": "A", "147": "C", "149": "A", "151": "C"
-        };
+// Función para iniciar el modo entrenamiento
+function startTrainingMode() {
+    document.getElementById('introPage').classList.remove('active');
+    document.getElementById('trainingPage').classList.add('active');
+}
 
-        // Variables globales
-        let currentQuestion = 0;
-        const answers = {};
+// Función para seleccionar una escala
+function selectScale(scaleKey) {
+    currentTrainingScale = scaleKey;
+    currentTrainingQuestion = 0;
+    trainingAnswers = {};
+    
+    // Ocultar selector y mostrar preguntas
+    document.getElementById('scaleSelector').style.display = 'none';
+    document.getElementById('trainingQuestionPage').style.display = 'block';
+    showTrainingQuestion();
+}
 
-        // Preguntas del test
-        const questions = [
+// Función para mostrar la pregunta actual del entrenamiento
+function showTrainingQuestion() {
+    const scale = scales[currentTrainingScale];
+    const questionNumber = scale.questions[currentTrainingQuestion];
+    const question = questions.find(q => q.number === questionNumber);
+    
+    document.getElementById('trainingQuestionNumber').textContent = 
+        `Pregunta ${currentTrainingQuestion + 1} de ${scale.questions.length}`;
+    document.getElementById('trainingQuestionText').textContent = question.text;
+    
+    // Actualizar barra de progreso
+    document.getElementById('trainingProgressFill').style.width = 
+        `${(currentTrainingQuestion + 1) / scale.questions.length * 100}%`;
+    
+    // Mostrar opciones
+    const optionsContainer = document.getElementById('trainingOptionsContainer');
+    optionsContainer.innerHTML = '';
+    question.options.forEach(option => {
+        const button = document.createElement('button');
+        button.className = 'option-button';
+        button.onclick = () => selectTrainingOption(option.id);
+        button.textContent = option.text;
+        optionsContainer.appendChild(button);
+    });
+    
+    document.getElementById('trainingNextButton').disabled = true;
+}
+
+// Función para seleccionar una opción en el entrenamiento
+function selectTrainingOption(optionId) {
+    const buttons = document.querySelectorAll('#trainingOptionsContainer .option-button');
+    buttons.forEach(button => button.classList.remove('selected'));
+    
+    const selectedButton = Array.from(buttons).find(
+        button => button.textContent.includes(optionId.toUpperCase())
+    );
+    if (selectedButton) {
+        selectedButton.classList.add('selected');
+    }
+    
+    const questionNumber = scales[currentTrainingScale].questions[currentTrainingQuestion];
+    trainingAnswers[questionNumber] = optionId;
+    document.getElementById('trainingNextButton').disabled = false;
+}
+
+// Función para pasar a la siguiente pregunta del entrenamiento
+function nextTrainingQuestion() {
+    const scale = scales[currentTrainingScale];
+    if (currentTrainingQuestion < scale.questions.length - 1) {
+        currentTrainingQuestion++;
+        showTrainingQuestion();
+    } else {
+        showTrainingResults();
+    }
+}
+
+// Función para mostrar los resultados del entrenamiento
+function showTrainingResults() {
+    document.getElementById('trainingQuestionPage').style.display = 'none';
+    document.getElementById('trainingResultsPage').style.display = 'block';
+    
+    const scale = scales[currentTrainingScale];
+    let score = 0;
+    const responses = [];
+    
+    scale.questions.forEach(questionNum => {
+        if (trainingAnswers[questionNum]) {
+            const points = calculateQuestionScore(questionNum, trainingAnswers[questionNum]);
+            score += points;
+            responses.push({
+                number: questionNum,
+                response: trainingAnswers[questionNum],
+                points: points,
+                question: questions.find(q => q.number === questionNum)
+            });
+        }
+    });
+    
+    const isValid = score >= scale.validRange.min && 
+                   (scale.validRange.max === Infinity || score <= scale.validRange.max);
+    const rangeText = scale.validRange.max === Infinity ? 
+        `Mayor a ${scale.validRange.min}` : 
+        `Entre ${scale.validRange.min} y ${scale.validRange.max}`;
+    
+    const container = document.getElementById('trainingResultsContainer');
+    container.innerHTML = `
+        <div class="scale-result">
+            <div class="scale-header">
+                <span class="scale-name">${scale.name}</span>
+                <span class="scale-score" style="color: ${isValid ? 'green' : 'red'}">
+                    Puntuación: ${score}
+                </span>
+            </div>
+            <div class="scale-status ${isValid ? 'valid' : 'invalid'}">
+                ${isValid ? 'DENTRO DEL RANGO' : 'FUERA DEL RANGO'}
+            </div>
+            <div class="scale-details">
+                <p>Rango esperado: ${rangeText}</p>
+                <div style="margin-top: 20px;">
+                    <h4>Detalle de respuestas:</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Pregunta</th>
+                                <th>Respuesta</th>
+                                <th>Puntos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${responses.map(resp => `
+                                <tr>
+                                    <td>${resp.number}. ${resp.question.text}</td>
+                                    <td>${resp.response.toUpperCase()}</td>
+                                    <td>${resp.points}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="2">Total:</td>
+                                <td>${score}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Función para volver a la selección de escala
+function backToScaleSelection() {
+    document.getElementById('trainingQuestionPage').style.display = 'none';
+    document.getElementById('trainingResultsPage').style.display = 'none';
+    document.getElementById('scaleSelector').style.display = 'block';
+    currentTrainingScale = null;
+    currentTrainingQuestion = 0;
+    trainingAnswers = {};
+}
+
+// Configuración de escalas
+const scales = {
+    sinceridad: {
+        name: "Sinceridad",
+        questions: [23,34,48,58,75,85,95,101,115,144,153],
+        validRange: { min: 8, max: 19 }
+    },
+    afabilidad: {
+        name: "Afabilidad",
+        questions: [1,31,33,63,65,96,98,127,129,159,161],
+        validRange: { min: 18, max: Infinity }
+    },
+    estabilidadEmocional: {
+        name: "Estabilidad Emocional",
+        questions: [2,32,35,64,67,97,128,131,160,162],
+        validRange: { min: 20, max: Infinity }
+    },
+    dominancia: {
+        name: "Dominancia",
+        questions: [3,36,38,66,99,102,130,132,163,165],
+        validRange: { min: 14, max: 16 }
+    },
+    animacion: {
+        name: "Animación",
+        questions: [4,6,37,39,68,70,100,103,133,134,164],
+        validRange: { min: 14, max: 16 }
+    },
+    atencionNormas: {
+        name: "Atención a las Normas",
+        questions: [5,7,40,69,72,104,106,136,166,168],
+        validRange: { min: 20, max: Infinity }
+    },
+    atrevimiento: {
+        name: "Atrevimiento",
+        questions: [9,41,71,73,105,107,135,137,167,169],
+        validRange: { min: 20, max: Infinity }
+    },
+    sensibilidad: {
+        name: "Sensibilidad",
+        questions: [8,10,42,44,74,77,108,110,138,140,170],
+        validRange: { min: 7, max: 10 }
+    },
+    vigilancia: {
+        name: "Vigilancia",
+        questions: [11,13,43,45,76,78,109,112,139,141],
+        validRange: { min: 0, max: Infinity }
+    },
+    abstraccion: {
+        name: "Abstracción",
+        questions: [12,14,17,46,49,79,91,111,114,142,145],
+        validRange: { min: 0, max: 2 }
+    },
+    privacidad: {
+        name: "Privacidad",
+        questions: [15,18,47,50,80,84,113,117,143,148],
+        validRange: { min: 7, max: 13 }
+    },
+    apresion: {
+        name: "Aprensión",
+        questions: [19,21,51,54,82,87,116,119,146,150],
+        validRange: { min: 0, max: 5 }
+    },
+    aperturaCambio: {
+        name: "Apertura al Cambio",
+        questions: [20,22,24,52,53,55,83,86,88,118,120,147,149,151],
+        validRange: { min: 13, max: Infinity }
+    },
+    autosuficiencia: {
+        name: "Autosuficiencia",
+        questions: [25,27,56,59,89,92,121,123,152,156],
+        validRange: { min: 0, max: 4 }
+    },
+    perfeccionismo: {
+        name: "Perfeccionismo",
+        questions: [26,29,57,61,90,93,122,125,154,157],
+        validRange: { min: 18, max: 20 }
+    },
+    tension: {
+        name: "Tensión",
+        questions: [28,30,60,62,91,94,124,126,155,158],
+        validRange: { min: 0, max: 2 }
+    }
+};
+
+// Configuración de puntuaciones (valores que valen 2 puntos)
+const twoPointAnswers = {
+    "2": "A", "32": "C", "35": "C", "64": "A", "67": "C", "97": "A", "128": "A",
+    "131": "C", "160": "A", "162": "A", "9": "A", "41": "C", "71": "C", "73": "A",
+    "105": "C", "107": "C", "135": "A", "137": "A", "167": "C", "169": "C", "3": "A",
+    "36": "A", "38": "A", "66": "A", "99": "A", "102": "C", "130": "A", "132": "A",
+    "163": "C", "165": "A", "8": "C", "10": "A", "42": "A", "44": "A", "74": "A",
+    "77": "A", "108": "A", "110": "C", "138": "C", "140": "C", "170": "C", "16": "C",
+    "23": "C", "34": "C", "48": "C", "58": "C", "75": "C", "85": "C", "95": "C",
+    "101": "C", "115": "C", "144": "C", "153": "A", "11": "C", "13": "A", "43": "A",
+    "45": "C", "76": "A", "78": "C", "109": "C", "112": "A", "139": "C", "141": "A",
+    "1": "C", "31": "A", "33": "A", "63": "C", "65": "C", "96": "A", "98": "C",
+    "127": "A", "129": "C", "159": "A", "161": "A", "12": "A", "14": "A", "17": "C",
+    "46": "C", "49": "C", "79": "A", "81": "C", "111": "A", "114": "C", "142": "A",
+    "145": "A", "4": "A", "6": "C", "37": "C", "39": "A", "68": "A", "70": "C",
+    "100": "A", "103": "A", "133": "A", "134": "A", "164": "C", "15": "C", "18": "C",
+    "47": "A", "50": "A", "80": "A", "84": "C", "113": "A", "117": "C", "143": "A",
+    "148": "A", "5": "A", "7": "A", "40": "A", "69": "A", "72": "C", "104": "A",
+    "106": "C", "136": "C", "166": "C", "168": "A", "19": "C", "21": "C", "51": "A",
+    "54": "A", "82": "C", "87": "A", "116": "A", "119": "C", "146": "A", "150": "A",
+    "26": "C", "29": "C", "57": "C", "61": "A", "90": "C", "93": "A", "122": "C",
+    "125": "A", "154": "C", "157": "A", "25": "C", "27": "A", "56": "C", "59": "A",
+    "89": "A", "92": "C", "121": "A", "123": "C", "152": "A", "156": "C", "28": "A",
+    "30": "A", "60": "C", "62": "A", "91": "C", "94": "C", "124": "C", "126": "A",
+    "155": "A", "158": "A", "20": "A", "22": "A", "24": "C", "52": "C", "53": "A",
+    "55": "C", "83": "A", "86": "C", "88": "A", "118": "A", "120": "A", "147": "C", 
+    "149": "A", "151": "C"
+};
+
+// Preguntas del test
+const questions = [
         {
     number: 1,
     text: "En un negocio sería más interesante encargarse de:",
@@ -1916,227 +2255,97 @@
 }        
 ];
 
-        // Funciones principales
-        function startTest() {
-            document.getElementById('introPage').classList.remove('active');
-            document.getElementById('questionPage').classList.add('active');
-            showQuestion();
-        }
 
-        function showQuestion() {
-            const question = questions[currentQuestion];
-            document.getElementById('questionNumber').textContent = `Pregunta ${question.number} de 170`;
-            document.getElementById('questionText').textContent = question.text;
-            
-            const optionsContainer = document.getElementById('optionsContainer');
-            optionsContainer.innerHTML = '';
-            question.options.forEach(option => {
-                const button = document.createElement('button');
-                button.className = 'option-button';
-                button.onclick = () => selectOption(option.id);
-                button.textContent = option.text;
-                optionsContainer.appendChild(button);
-            });
+// Variables globales principales
+let currentQuestion = 0;
+const answers = {};
 
-            // Actualizar barra de progreso
-            document.getElementById('progressFill').style.width = `${(currentQuestion + 1) / questions.length * 100}%`;
-            
-            // Restaurar respuesta previa si existe
-            if (answers[question.number]) {
-                const buttons = optionsContainer.getElementsByClassName('option-button');
-                for (let i = 0; i < buttons.length; i++) {
-                    if (buttons[i].textContent === getOptionTextById(question, answers[question.number])) {
-                        buttons[i].classList.add('selected');
-                        break;
-                    }
-                }
-                document.getElementById('nextButton').disabled = false;
-            } else {
-                document.getElementById('nextButton').disabled = true;
-            }
-        }
-
-        function getOptionTextById(question, optionId) {
-            return question.options.find(opt => opt.id === optionId).text;
-        }
-
-        function selectOption(optionId) {
-            const buttons = document.getElementsByClassName('option-button');
-            Array.from(buttons).forEach(button => button.classList.remove('selected'));
-            
-            const selectedButton = Array.from(buttons).find(
-                button => button.textContent === getOptionTextById(questions[currentQuestion], optionId)
-            );
-            if (selectedButton) {
-                selectedButton.classList.add('selected');
-            }
-            
-            answers[questions[currentQuestion].number] = optionId;
-            document.getElementById('nextButton').disabled = false;
-        }
-
-        function calculateQuestionScore(questionNumber, answer) {
-            if (answer === 'b') return 1;
-            const twoPointAnswer = twoPointAnswers[questionNumber];
-            return answer.toUpperCase() === twoPointAnswer ? 2 : 0;
-        }
-
-        function nextQuestion() {
-            if (currentQuestion < questions.length - 1) {
-                currentQuestion++;
-                showQuestion();
-            } else {
-                showResults();
-            }
-        }
-
-        function calculateResults() {
-    const results = {};
-    let totalBAnswers = 0;
-    
-    // Contar respuestas B
-    Object.values(answers).forEach(answer => {
-        if (answer === 'b') totalBAnswers++;
-    });
-    
-    Object.entries(scales).forEach(([scaleKey, scale]) => {
-        let score = 0;
-        const questionResponses = [];
-        
-        scale.questions.forEach(questionNum => {
-            if (answers[questionNum]) {
-                const points = calculateQuestionScore(questionNum, answers[questionNum]);
-                score += points;
-                questionResponses.push({
-                    number: questionNum,
-                    response: answers[questionNum],
-                    points: points
-                });
-            }
-        });
-        
-        const isValid = score >= scale.validRange.min && 
-                      (scale.validRange.max === Infinity || score <= scale.validRange.max);
-        
-        results[scaleKey] = {
-            name: scale.name,
-            score: score,
-            isValid: isValid,
-            validRange: scale.validRange,
-            responses: questionResponses
-        };
-    });
-    
-    results.totalB = totalBAnswers;
-    results.isAptitude = totalBAnswers <= 15 && Object.values(results)
-        .filter(r => typeof r === 'object' && 'isValid' in r)
-        .every(r => r.isValid);
-    
-    return results;
-}
-function showResults() {
-    document.getElementById('questionPage').classList.remove('active');
-    document.getElementById('resultsPage').classList.add('active');
-    
-    const results = calculateResults();
-    const container = document.getElementById('resultsContainer');
-    container.innerHTML = '';
-    
-    // Resumen general
-    const validScales = Object.values(results)
-        .filter(r => typeof r === 'object' && 'isValid' in r)
-        .filter(r => r.isValid).length;
-    const totalScales = Object.values(results)
-        .filter(r => typeof r === 'object' && 'isValid' in r).length;
-    
-    container.innerHTML += `
-        <div class="scale-result">
-            <h3>Resumen General</h3>
-            <div style="margin-bottom: 10px;">
-                <strong>Estado: </strong>
-                <span style="color: ${results.isAptitude ? 'green' : 'red'}; font-weight: bold;">
-                    ${results.isAptitude ? 'APTO' : 'NO APTO'}
-                </span>
-            </div>
-            <p>Escalas dentro del rango: ${validScales} de ${totalScales}</p>
-            
-            <p>Total respuestas B: <span style="color: ${results.totalB <= 15 ? 'green' : 'red'}">
-                ${results.totalB}/15</span>
-            </p>
-        </div>
-    `;
-
-    // Resultados por escala
-    Object.entries(results).forEach(([key, result]) => {
-        if (typeof result !== 'object' || !('isValid' in result)) return;
-        
-        const rangeText = result.validRange.max === Infinity ? 
-            `Mayor a ${result.validRange.min}` : 
-            `Entre ${result.validRange.min} y ${result.validRange.max}`;
-        
-            let responsesHTML = `
-    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-        <thead>
-            <tr style="background-color: #f0f0f0;">
-                <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Nº Pregunta</th>
-                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Pregunta</th>
-                <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Respuesta</th>
-                <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Puntos</th>
-            </tr>
-        </thead>
-        <tbody>`;
-    
-    result.responses.forEach(resp => {
-        const question = questions.find(q => q.number === resp.number);
-        const selectedOption = question.options.find(opt => opt.id === resp.response);
-        responsesHTML += `
-            <tr>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${resp.number}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${question.text}</td>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${selectedOption.text}</td>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${resp.points}</td>
-            </tr>
-        `;
-    });
-    
-    responsesHTML += `
-        </tbody>
-        <tfoot>
-            <tr style="background-color: ${result.isValid ? '#e6ffe6' : '#ffe6e6'};">
-                <td colspan="3" style="padding: 8px; border: 1px solid #ddd; text-align: right;"><strong>Puntuación Total:</strong></td>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><strong>${result.score}</strong></td>
-            </tr>
-        </tfoot>
-    </table>`;
-        
-        container.innerHTML += `
-            <div class="scale-result">
-                <div class="scale-header">
-                    <span class="scale-name">${result.name}</span>
-                    <span class="scale-score" style="color: ${result.isValid ? 'green' : 'red'}">
-                        Puntuación: ${result.score}
-                    </span>
-                </div>
-                <div class="scale-status ${result.isValid ? 'valid' : 'invalid'}">
-                    ${result.isValid ? 'DENTRO DEL RANGO' : 'FUERA DEL RANGO'}
-                </div>
-                <div class="scale-details">
-                    <p>Rango esperado: ${rangeText}</p>
-                    <div style="margin-top: 10px;">
-                        <strong>Detalle de respuestas:</strong>
-                        ${responsesHTML}
-                    </div>
-                </div>
-            </div>
-        `;
-    });
+// Funciones principales del test
+function startTest() {
+    document.getElementById('introPage').classList.remove('active');
+    document.getElementById('questionPage').classList.add('active');
+    showQuestion();
 }
 
-        // Iniciar carga de preguntas
-        document.addEventListener('DOMContentLoaded', () => {
-            // El test está listo para comenzar
-        });
-        
+function showQuestion() {
+    const question = questions[currentQuestion];
+    document.getElementById('questionNumber').textContent = `Pregunta ${question.number} de 170`;
+    document.getElementById('questionText').textContent = question.text;
+    
+    const optionsContainer = document.getElementById('optionsContainer');
+    optionsContainer.innerHTML = '';
+    question.options.forEach(option => {
+        const button = document.createElement('button');
+        button.className = 'option-button';
+        button.onclick = () => selectOption(option.id);
+        button.textContent = option.text;
+        optionsContainer.appendChild(button);
+    });
+
+    // Actualizar barra de progreso
+    document.getElementById('progressFill').style.width = `${(currentQuestion + 1) / questions.length * 100}%`;
+    
+    // Restaurar respuesta previa si existe
+    if (answers[question.number]) {
+        const buttons = optionsContainer.getElementsByClassName('option-button');
+        for (let i = 0; i < buttons.length; i++) {
+            if (buttons[i].textContent === getOptionTextById(question, answers[question.number])) {
+                buttons[i].classList.add('selected');
+                break;
+            }
+        }
+        document.getElementById('nextButton').disabled = false;
+    } else {
+        document.getElementById('nextButton').disabled = true;
+    }
+}
+
+function getOptionTextById(question, optionId) {
+    return question.options.find(opt => opt.id === optionId).text;
+}
+
+function selectOption(optionId) {
+    const buttons = document.getElementsByClassName('option-button');
+    Array.from(buttons).forEach(button => button.classList.remove('selected'));
+    
+    const selectedButton = Array.from(buttons).find(
+        button => button.textContent === getOptionTextById(questions[currentQuestion], optionId)
+    );
+    if (selectedButton) {
+        selectedButton.classList.add('selected');
+    }
+    
+    answers[questions[currentQuestion].number] = optionId;
+    document.getElementById('nextButton').disabled = false;
+}
+
+function calculateQuestionScore(questionNumber, answer) {
+    if (answer === 'b') return 1;
+    const twoPointAnswer = twoPointAnswers[questionNumber];
+    return answer.toUpperCase() === twoPointAnswer ? 2 : 0;
+}
+
+function nextQuestion() {
+    if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        showQuestion();
+    } else {
+        showResults();
+    }
+}
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', () => {
+    // El test está listo para comenzar
+    const startButton = document.querySelector('.start-button');
+    const trainingButton = document.createElement('button');
+    trainingButton.className = 'start-button';
+    trainingButton.style.marginTop = '10px';
+    trainingButton.textContent = 'Modo Entrenamiento';
+    trainingButton.onclick = startTrainingMode;
+    startButton.parentNode.insertBefore(trainingButton, startButton.nextSibling);
+});
+
     </script>
 </body>
 </html>
