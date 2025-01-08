@@ -202,7 +202,7 @@
 
         /* Tabla de respuestas */
         table {
-            width: 95%;
+            width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
         }
@@ -240,7 +240,7 @@
                     <li>No hay respuestas correctas o incorrectas</li>
                     <li>Responda con sinceridad según su forma habitual de ser</li>
                     <li>No piense demasiado cada respuesta; su primera impresión suele ser la más precisa</li>
-                    <li>La opción "?" puede usarse cuando no esté seguro, pero trate de utilizarla lo menos posible (Max. 15)</li>
+                    <li>La opción "?" puede usarse cuando no esté seguro, pero trate de utilizarla lo menos posible</li>
                 </ul>
             </div>
             <button class="start-button" onclick="startTest()">Comenzar Test</button>
@@ -311,7 +311,7 @@
             vigilancia: {
                 name: "Vigilancia",
                 questions: [11,13,43,45,76,78,109,112,139,141],
-                validRange: { min: 0, max: 9 }
+                validRange: { min: 0, max: Infinity }
             },
             abstraccion: {
                 name: "Abstracción",
