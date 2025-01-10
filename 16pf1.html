@@ -2401,7 +2401,27 @@ function showResults() {
     summaryText.style.margin = '0';
     summaryText.textContent = allScalesValid ? 'Test APTO ✓' : 'Test NO APTO ✗';
     
+    // Contar respuestas "B"
+    const bCount = Object.values(answers).filter(answer => answer === 'b').length;
+    const isBCountValid = bCount <= 15;
+    
+    // Crear elemento para mostrar contador de B
+    const bCountText = document.createElement('p');
+    bCountText.style.marginTop = '10px';
+    bCountText.style.color = isBCountValid ? '#22543d' : '#742a2a';
+    bCountText.style.fontWeight = 'bold';
+    bCountText.textContent = `Respuestas "?" (B): ${bCount} - ${isBCountValid ? 'APTO' : 'NO APTO'}`;
+    
+    // Actualizar el estado general si hay demasiadas B
+    if (!isBCountValid) {
+        summaryText.textContent = 'Test NO APTO ✗';
+        summaryDiv.style.backgroundColor = '#fed7d7';
+        summaryDiv.style.border = '2px solid #ef4444';
+        summaryText.style.color = '#742a2a';
+    }
+    
     summaryDiv.appendChild(summaryText);
+    summaryDiv.appendChild(bCountText);
     resultsContainer.appendChild(summaryDiv);
     
     // Mostrar los resultados detallados de cada escala (código original)
@@ -2474,7 +2494,6 @@ function showResults() {
         resultsContainer.appendChild(scaleElement);
     });
 }
-
 function nextQuestion() {
     if (currentQuestion < questions.length - 1) {
         currentQuestion++;
