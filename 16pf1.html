@@ -586,7 +586,7 @@ function showTrainingResults() {
             </div>
             <div class="scale-details">
                 <div style="margin-top: 20px;">
-                    <h4>Detalle de respuestas:</h4>
+                   
                     <table>
                         <thead>
                             <tr>
@@ -680,7 +680,7 @@ const scales = {
     vigilancia: {
         name: "Vigilancia",
         questions: [11,13,43,45,76,78,109,112,139,141],
-        validRange: { min: 0, max: Infinity }
+        validRange: { min: 0, max: 10 }
     },
     abstraccion: {
         name: "Abstracción",
@@ -2367,7 +2367,44 @@ function showResults() {
     
     const resultsContainer = document.getElementById('resultsContainer');
     resultsContainer.innerHTML = '';
+
+    // Verificar si todas las escalas son válidas
+    let allScalesValid = true;
     
+    Object.entries(scales).forEach(([scaleKey, scale]) => {
+        let score = 0;
+        scale.questions.forEach(questionNum => {
+            if (answers[questionNum]) {
+                const answer = calculateCorrectAnswer(questionNum, answers[questionNum]);
+                score += answer.points;
+            }
+        });
+        
+        const isValid = score >= scale.validRange.min && 
+                       (scale.validRange.max === Infinity || score <= scale.validRange.max);
+        if (!isValid) {
+            allScalesValid = false;
+        }
+    });
+
+    // Añadir el resumen general al principio
+    const summaryDiv = document.createElement('div');
+    summaryDiv.style.textAlign = 'center';
+    summaryDiv.style.padding = '20px';
+    summaryDiv.style.marginBottom = '30px';
+    summaryDiv.style.backgroundColor = allScalesValid ? '#c6f6d5' : '#fed7d7';
+    summaryDiv.style.borderRadius = '8px';
+    summaryDiv.style.border = `2px solid ${allScalesValid ? '#22c55e' : '#ef4444'}`;
+    
+    const summaryText = document.createElement('h2');
+    summaryText.style.color = allScalesValid ? '#22543d' : '#742a2a';
+    summaryText.style.margin = '0';
+    summaryText.textContent = allScalesValid ? 'Test APTO ✓' : 'Test NO APTO ✗';
+    
+    summaryDiv.appendChild(summaryText);
+    resultsContainer.appendChild(summaryDiv);
+    
+    // Mostrar los resultados detallados de cada escala (código original)
     Object.entries(scales).forEach(([scaleKey, scale]) => {
         let score = 0;
         const responses = [];
@@ -2407,7 +2444,6 @@ function showResults() {
             </div>
             <div class="scale-details">
                 <div style="margin-top: 20px;">
-                    <h4>Detalle de respuestas:</h4>
                     <table>
                         <thead>
                             <tr>
