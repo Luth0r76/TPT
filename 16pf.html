@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test 16PF</title>
+    <style>
+        * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    padding: 20px;
+    background-color: #f0f2f5;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-height: 500px;
+}
+
+.page {
+    padding: 20px;
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.intro-page {
+    text-align: center;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #1a365d;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #000000;
+}
+
+.instructions {
+    text-align: left;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    max-width: 600px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: #e2e8f0;
+    border-radius: 5px;
+    margin: 20px 0;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.question-number {
+    font-size: 1.2em;
+    color: #4a5568;
+    margin-bottom: 10px;
+}
+
+.question-text {
+    font-size: 1.3em;
+    margin-bottom: 30px;
+    line-height: 1.4;
+    font-weight: 600;
+}
+
+.options-container {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.option-button {
+    padding: 15px 20px;
+    font-size: 1.1em;
+    background-color: #edf2f7;
+    border: 2px solid #cbd5e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+}
+
+.option-button:hover {
+    background-color: #e2e8f0;
+    transform: translateY(-2px);
+}
+
+.option-button.selected {
+    background-color: #FFD700;
+    color: black;
+    border-color: #FFA500;
+}
+
+.start-button, .nav-button {
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    padding: 12px 24px;
+    font-size: 1.2em;
+    background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+    color: black;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.start-button:hover, .nav-button:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(90deg, #FFA500 0%, #FF8C00 100%);
+}
+
+.nav-button:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.scale-result {
+    background-color: #f8fafc;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+}
+
+.scale-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.scale-name {
+    font-weight: bold;
+}
+
+.scale-score {
+    font-size: 1.1em;
+    color: #2b6cb0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+
+tfoot tr {
+    font-weight: bold;
+    background-color: #f8fafc;
+}
+
+.summary-container {
+    background-color: #f8fafc;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.summary-table td {
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.summary-table td:first-child {
+    font-weight: bold;
+    width: 40%;
+}
+
+.results-header {
+    background-color: #f1f5f9;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.valid {
+    background-color: #f0fff4;
+    border-color: #9ae6b4;
+}
+
+.invalid {
+    background-color: #fff5f5;
+    border-color: #feb2b2;
+}
+
+.status-indicator {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.status-success {
+    background-color: #c6f6d5;
+    color: #22543d;
+}
+
+.status-error {
+    background-color: #fed7d7;
+    color: #742a2a;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Página de inicio -->
+        <div id="introPage" class="page active">
+            <h1>JOSE ACADEMY 🤖</h1>
+            <h2>Test 16PF (antiguo)</h2>
+            <h3>Cuestionario de Personalidad</h3>
+            <div class="instructions">
+                <h3>Instrucciones</h3>
+                <p>A continuación encontrará una serie de preguntas que permitirán conocer sus actitudes e intereses.</p>
+                <ul>
+                    <li>No existen respuestas correctas o incorrectas</li>
+                    <li>Conteste con sinceridad según su forma habitual de ser</li>
+                    <li>No piense demasiado cada respuesta; su primera impresión suele ser la más precisa</li>
+                    <li>Cada pregunta tiene tres posibles respuestas (A, B, C)</li>
+                    <li>La opción "B" o "término medio" puede usarse cuando no esté seguro, pero trate de utilizarla lo menos posible</li>
+                </ul>
+            </div>
+            <button class="start-button" onclick="startTest()">Comenzar Test</button>
+        </div>
+
+        <!-- Página de preguntas -->
+        <div id="questionPage" class="page">
+            <h1>JOSE ACADEMY 🤖</h1>
+            <h2>Test 16PF (antiguo)</h2>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <div class="question-number" id="questionNumber"></div>
+            <div class="question-text" id="questionText"></div>
+            <div class="options-container" id="optionsContainer"></div>
+            <button class="nav-button" id="nextButton" onclick="nextQuestion()" disabled>Siguiente</button>
+        </div>
+
+        <!-- Página de resultados -->
+        <div id="resultsPage" class="page">
+            <h2>Resultados del Test</h2>
+            <div id="resultsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de escalas (basado en el PDF)
+        const scales = {
+   
+    DM: {
+        name: "Sizoidal, Personal Retraida, Apartada",  // APTD entre 2 y 5
+        questions: [1, 2, 18, 35, 52, 69, 86],
+        validRange: { min: 2, max: 5 }
+    },
+    A: {
+        name: "Sizoidal, Personal Retraida, Apartada",  // APTD 1,2,3 (8)
+        questions: [19, 36, 53, 70, 87, 103],
+        validRange: { min: 9, max: Infinity }
+    },
+    B: {
+        name: "Inteligencia",  // APTO más de 5 
+        questions: [3, 20, 37, 54, 71, 88, 104, 105],
+        validRange: { min: 5, max: Infinity }
+    },
+    C: {
+        name: "Estabilidad Emocional",  // APTO más de 8
+        questions: [4, 21, 38, 55, 72, 89],
+        validRange: { min: 8, max: Infinity }
+    },
+    E: {
+        name: "Sumisión - Dominancia",  // APTO DE 5 a 7
+        questions: [5, 22, 39, 56, 73, 90],
+        validRange: { min: 5, max: 7 }
+    },
+    F: {
+        name: "Sombrio, Prudente - Descuidado, Impulsivo",  // APTO DE 4,5,6
+        questions: [6, 23, 40, 57, 74, 91],
+        validRange: { min: 3, max: 6 }
+    },
+    G: {
+        name: "Despreocupado - Sensato",  // APTO + DE 8 (12)
+        questions: [7, 24, 41, 58, 75, 92],
+        validRange: { min: 8, max: Infinity }
+    },
+    H: {
+        name: "Tímido, Temeroso - Seguro y Atrevido en lo Social",  // APTO + DE 8 (10)
+        questions: [8, 25, 42, 59, 76, 93],
+        validRange: { min: 8, max: Infinity }
+    },
+    I: {
+        name: "Nada Sentimental - Sensibe",  // APTO DE 3 a 6
+        questions: [9, 26, 43, 60, 77, 94],
+        validRange: { min: 3, max: 6 }
+    },
+    L: {
+        name: "Confiado - Vigilante",  // APTO DE 2 a 4
+        questions: [10, 27, 44, 61, 78, 95],
+        validRange: { min: 2, max: 4 }
+    },
+    M: {
+        name: "Práctico - Imaginativo",  // APTO DE 2 a 5
+        questions: [11, 28, 45, 62, 79, 96],
+        validRange: { min: 2, max: 5 }
+    },
+    N: {
+        name: "Sencillo, Franco - Astuto",  // APTO DE 2,3
+        questions: [12, 29, 46, 63, 80, 97],
+        validRange: { min: 4, max: 7 }
+    },
+    O: {
+        name: "Apacible, Sereno - Agresivo, Depresivo",
+        questions: [13, 30, 47, 64, 81, 98],
+        validRange: { min: 0, max: 2 }
+    },
+    Q1: {
+        name: "Conservador, Tradicional - Liberal, Radical",
+        questions: [14, 31, 48, 65, 82, 99],
+        validRange: { min: 0, max: 4 }
+    },
+    Q2: {
+        name: "Dependiente - Individualista",
+        questions: [15, 32, 49, 66, 83, 100],
+        validRange: { min: 3, max: 6 }
+    },
+    Q3: {
+        name: "Autoconflictivo - Socialmente Adaptado",
+        questions: [16, 33, 50, 67, 84, 101],
+        validRange: { min: 9, max: Infinity }
+    },
+    Q4: {
+        name: "Relajado, Tranquilo - Tenso, Sobreexcitado",
+        questions: [17, 34, 51, 68, 85, 102],
+        validRange: { min: 2, max: 5 }
+    }
+};
+
+
+
+
+const twoPointAnswers = {
+    
+    "1": "A",
+    "2": "C",
+    "4": "A",
+    "5": "C",
+    "6": "C",
+    "7": "A",
+    "8": "A",
+    "9": "A",
+    "10": "A",
+    "11": "C",
+    "12": "C",
+    "13": "C",
+    "14": "A",
+    "15": "A",
+    "16": "A",
+    "17": "A",
+    "18": "C",
+    "19": "A",
+    "20": "C", // la 20=C esta vale 1
+    "21": "A",
+    "22": "C",
+    "23": "A",
+    "24": "C",
+    "25": "C",
+    "26": "A",
+    "27": "C",
+    "28": "C",
+    "29": "A",
+    "30": "A",
+    "31": "A",
+    "32": "C",
+    "33": "A",
+    "34": "C",
+    "35": "C",
+    "36": "C",
+    "38": "C",
+    "39": "A",
+    "40": "C",
+    "41": "A",
+    "42": "C",
+    "43": "C",
+    "44": "C",
+    "45": "A",
+    "46": "A",
+    "47": "C",
+    "48": "C",
+    "49": "A",
+    "50": "A",
+    "51": "C",
+    "52": "A",
+    "53": "A",
+    "54": "C",
+    "55": "A",
+    "56": "A",
+    "57": "A",
+    "58": "C",
+    "59": "A",
+    "60": "A",
+    "61": "C",
+    "62": "A",
+    "63": "A",
+    "64": "A",
+    "65": "C",
+    "66": "A",
+    "67": "C",
+    "68": "A",
+    "69": "C",
+    "70": "A",
+    "71": "A",
+    "72": "C",
+    "73": "C",
+    "74": "A",
+    "75": "A",
+    "76": "A",
+    "77": "C",
+    "78": "A",
+    "79": "A",
+    "80": "C",
+    "81": "C",
+    "82": "C",
+    "83": "C",
+    "84": "C",
+    "85": "C",
+    "86": "C",
+    "88": "C",
+    "87": "C",
+    "89": "C",
+    "90": "A",
+    "91": "C",
+    "92": "C",
+    "93": "C",
+    "94": "C",
+    "95": "A",
+    "96": "C",
+    "97": "C",
+    "98": "A",
+    "99": "A",
+    "100": "C",
+    "101": "C",
+    "102": "A",
+    "103": "C",
+    "104": "A"
+};
+
+        // Preguntas del test 
+        const questions = [
+    {
+        number: 1,
+        text: "Creo que mi memoria es ahora mejor que antes:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 2,
+        text: "Normalmente sé cuánto dinero llevo en el bolsillo:",
+        options: [
+            { id: "a", text: "A. Falso" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Verdadero" }
+        ]
+    },
+    {
+        number: 3,
+        text: "Si dijera que 'el techo está abajo' y que 'el hielo es caliente' podría llamarle criminal a un:",
+        options: [
+            { id: "a", text: "A. Bandido" },
+            { id: "b", text: "B. Santo" },
+            { id: "c", text: "C. Profesor" }
+        ]
+    },
+    {
+        number: 4,
+        text: "Cuando me voy a la cama:",
+        options: [
+            { id: "a", text: "A. Me duermo en seguida" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Me cuesta dormirme" }
+        ]
+    },
+    {
+        number: 5,
+        text: "Si condujera un coche en caravana, procuraría:",
+        options: [
+            { id: "a", text: "A. Avanzar con la fila de coches" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Adelantarlos a todos" }
+        ]
+    },
+    {
+        number: 6,
+        text: "En una fiesta o reunión prefiero que sean otros los que cuenten chistes o historietas:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. No lo sé" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 7,
+        text: "Para mí es importante vivir en una zona que no sea un barrio mal acondicionado:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. No lo sé" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 8,
+        text: "La mayor parte de la gente que me encuentro en una fiesta se alegra realmente de verme:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A veces" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 9,
+        text: "Para hacer ejercicio, preferiría:",
+        options: [
+            { id: "a", text: "A. Gimnasia Rítmica" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Montañismo o fútbol" }
+        ]
+    },
+    {
+        number: 10,
+        text: "Me hace gracia notar la gran diferencia entre lo que la gente predica y lo que hace:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. De vez en cuando" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 11,
+        text: "Cuando me entero de un accidente, me gusta conocer los detalles de cómo ocurrió:",
+        options: [
+            { id: "a", text: "A. Siempre" },
+            { id: "b", text: "B. A veces" },
+            { id: "c", text: "C. Raras veces" }
+        ]
+    },
+    {
+        number: 12,
+        text: "Cuando los amigos me gastan una broma suelo reírme tanto como ellos, sin molestarme:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 13,
+        text: "Cuando alguien me habla enojado, suelo olvidar el tema rápidamente:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 14,
+        text: "Prefiero pensar en nuevos modos de hacer las cosas que seguir los caminos ya conocidos:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 15,
+        text: "Cuando estoy pensando cómo hacer algo, prefiero estar solo, sin recibir ayuda de nadie:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. De vez en cuando" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+// Continuación de las preguntas (16-30)
+{
+        number: 16,
+        text: "Creo que soy menos nervioso que la mayoría de la gente:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 17,
+        text: "Fácilmente me pongo impaciente con la gente que tarda en tomar decisiones:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 18,
+        text: "Alguna vez, aunque por poco tiempo, he odiado a mis padres:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 19,
+        text: "Lo que pienso y siento:",
+        options: [
+            { id: "a", text: "A. Lo cuento a mis mejores amigos" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Me lo guardo" }
+        ]
+    },
+    {
+        number: 20,
+        text: "Lo contrario de lo contrario de 'inexacto' es:",
+        options: [
+            { id: "a", text: "A. Justo" },
+            { id: "b", text: "B. Preciso" },
+            { id: "c", text: "C. Erróneo" }
+        ]
+    },
+    {
+        number: 21,
+        text: "Siempre tengo mucha energía cuando la necesito:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 22,
+        text: "Me molestan más las personas cuando:",
+        options: [
+            { id: "a", text: "A. Cuentan chistes verdes que ruborizan a la gente" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Llegan tarde a una cita" }
+        ]
+    },
+    {
+        number: 23,
+        text: "Me gusta tener invitados en casa y distraerlos:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 24,
+        text: "Creo que:",
+        options: [
+            { id: "a", text: "A. Algunos trabajos no necesitan tanto cuidado como otros" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Todo trabajo debe ser realizado" }
+        ]
+    },
+    {
+        number: 25,
+        text: "He tenido que luchar para vencer mi timidez:",
+        options: [
+            { id: "a", text: "A. Siempre" },
+            { id: "b", text: "B. Algunas veces" },
+            { id: "c", text: "C. Nunca" }
+        ]
+    },
+    {
+        number: 26,
+        text: "Creo que es más interesante ser:",
+        options: [
+            { id: "a", text: "A. Jardinero" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Guardabosques" }
+        ]
+    },
+    {
+        number: 27,
+        text: "Si un compañero me hace una pequeña talla, lo tomo a broma en vez de enfadarme con él:",
+        options: [
+            { id: "a", text: "A. Si" },
+            { id: "b", text: "B. De vez en cuando" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 28,
+        text: "Prefiero los amigos que:",
+        options: [
+            { id: "a", text: "A. Son prácticos y realistas en sus intereses" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Piensan seriamente sus posturas ante la vida" }
+        ]
+    },
+    {
+        number: 29,
+        text: "Me fastidia escuchar a otros cuando dicen cosas contrarias a las que yo pienso firmemente:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 30,
+        text: "Me sigue preocupando seriamente lo que hice en el pasado o los errores cometidos:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 31,
+        text: "Si fuera igualmente hábil en ambos juegos, preferiría:",
+        options: [
+            { id: "a", text: "A. El ajedrez" },
+            { id: "b", text: "B. Ambos" },
+            { id: "c", text: "C. Los bolos (Bowling)" }
+        ]
+    },
+    {
+        number: 32,
+        text: "Me agrada estar con gente que demuestre entusiasmo y animación en los grupos:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 33,
+        text: "Durante las Navidades saludo a mis amigos y conocidos enviándoles tarjetas postales:",
+        options: [
+            { id: "a", text: "A. Casi siempre" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Raras veces" }
+        ]
+    },
+    {
+        number: 34,
+        text: "Cuando es necesario, soy capaz de olvidarme de mis preocupaciones y responsabilidades:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A veces" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 35,
+        text: "Cuando me equivoco me cuesta admitirlo:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A veces" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 36,
+        text: "En una fábrica sería más importante encargarse de:",
+        options: [
+            { id: "a", text: "A. Las máquinas o archivos" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Recibir y contratar gente" }
+        ]
+    },
+    {
+        number: 37,
+        text: "¿Cuál de las siguientes palabras es diferente de las otras dos?:",
+        options: [
+            { id: "a", text: "A. Gato" },
+            { id: "b", text: "B. Próximo" },
+            { id: "c", text: "C. Sol" }
+        ]
+    },
+    {
+        number: 38,
+        text: "Pienso que las pequeñas interrupciones:",
+        options: [
+            { id: "a", text: "A. Me irritan" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. No me molestan" }
+        ]
+    },
+    {
+        number: 39,
+        text: "Cuando tengo que replicarle a alguien me cuesta encontrar palabras:",
+        options: [
+            { id: "a", text: "A. No" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Sí" }
+        ]
+    },
+    {
+        number: 40,
+        text: "Preferiría vivir en un barrio:",
+        options: [
+            { id: "a", text: "A. artísticamente rico, pero económicamente pobre" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Feo, pero próspero y floreciente" }
+        ]
+    },
+    {
+        number: 41,
+        text: "La gente debería insistir más para que se respeten las normas morales:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A veces" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 42,
+        text: "Me han dicho que, de niño normalmente era:",
+        options: [
+            { id: "a", text: "A. Tranquilo y callado" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Revoltoso y vivo" }
+        ]
+    },
+    {
+        number: 43,
+        text: "Disfruto realizando trabajos constructivos que exijan máquinas o herramientas de precisión:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 44,
+        text: "Creo que la mayoría de los testigos dicen la verdad aunque esto les cause molestias:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 45,
+        text: "Cuando me presentan a un desconocido, prefiero:",
+        options: [
+            { id: "a", text: "A. Hablar con él de política o temas sociales" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Que me cuente los chistes o anécdotas que conozca" }
+        ]
+    },
+    {
+        number: 46,
+        text: "Cuando me cuentan un chiste procuro reírme menos que los demás:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 47,
+        text: "Nunca me siento tan desdichado como para ponerme a llorar:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 48,
+        text: "Escuchando música prefiero:",
+        options: [
+            { id: "a", text: "A. Una marcha militar" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Un concierto de guitarra" }
+        ]
+    },
+    {
+        number: 49,
+        text: "En el verano, me gustaría pasar dos semanas:",
+        options: [
+            { id: "a", text: "A. Caminando y contemplando el campo" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Dirigiendo un campamento" }
+        ]
+    },
+    {
+        number: 50,
+        text: "Las horas dedicadas a planear el futuro:",
+        options: [
+            { id: "a", text: "A. Nunca son tiempo perdido" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. No sirven de nada" }
+        ]
+    },
+    {
+        number: 51,
+        text: "Me irritan o molestan muy poco las desconsideraciones o críticas de mis compañeros:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 52,
+        text: "Cuando salgo con alguien suelo:",
+        options: [
+            { id: "a", text: "A. Decidir yo a dónde vamos" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Dejar la iniciativa al otro" }
+        ]
+    },
+    {
+        number: 53,
+        text: "Preferiría estar:",
+        options: [
+            { id: "a", text: "A. Atendiendo público en una oficina" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Dibujando planos en un despacho tranquilo" }
+        ]
+    },
+    {
+        number: 54,
+        text: "Casa es a habitación como árbol es a:",
+        options: [
+            { id: "a", text: "A. Bosque" },
+            { id: "b", text: "B. Planta" },
+            { id: "c", text: "C. Rama" }
+        ]
+    },
+    {
+        number: 55,
+        text: "Las cosas me salen mal:",
+        options: [
+            { id: "a", text: "A. Raramente" },
+            { id: "b", text: "B. De vez en cuando" },
+            { id: "c", text: "C. Frecuentemente" }
+        ]
+    },
+    {
+        number: 56,
+        text: "En la mayoría de las cosas de la vida creo que es mejor:",
+        options: [
+            { id: "a", text: "A. Tentar la suerte" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Actuar seguro" }
+        ]
+    },
+    {
+        number: 57,
+        text: "Algunas personas pueden pensar que yo hablo demasiado:",
+        options: [
+            { id: "a", text: "A. Probablemente" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Imposible" }
+        ]
+    },
+    {
+        number: 58,
+        text: "Admiro más:",
+        options: [
+            { id: "a", text: "A. A una persona inteligente, pero poco honrada" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. A una persona corriente, pero honrada" }
+        ]
+    },
+    {
+        number: 59,
+        text: "Tomo decisiones:",
+        options: [
+            { id: "a", text: "A. Más de prisa que la mayoría de la gente" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Más despacio que la mayoría de la gente" }
+        ]
+    },
+    {
+        number: 60,
+        text: "Me impresiona más:",
+        options: [
+            { id: "a", text: "A. La habilidad o la gracia" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. La fuerza o el poder" }
+        ]
+    },        
+    {
+        number: 61,
+        text: "La gente suele contar normalmente conmigo:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 62,
+        text: "Disfruto más charlando:",
+        options: [
+            { id: "a", text: "A. Con gente cortés y educada" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Con individuos sencillos y realistas" }
+        ]
+    },
+    {
+        number: 63,
+        text: "Cuando tengo problemas prefiero:",
+        options: [
+            { id: "a", text: "A. Guardármelos para mis adentros" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Contárselos a mis amigos" }
+        ]
+    },
+    {
+        number: 64,
+        text: "Cuando una persona no responde a una sugerencia mía, pienso que he dicho una tontería:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 65,
+        text: "Cuando era estudiante, aprendía más:",
+        options: [
+            { id: "a", text: "A. Yendo a clases" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Leyendo libros" }
+        ]
+    },
+    {
+        number: 66,
+        text: "Evito aceptar cargos o responsabilidades en organizaciones de tipo social:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. A veces" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 67,
+        text: "Si un asunto se me pone difícil y tengo otros que resolver, intento:",
+        options: [
+            { id: "a", text: "A. Cambiar de tarea" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Abordar la dificultad de una manera distinta" }
+        ]
+    },
+    {
+        number: 68,
+        text: "A veces tengo bruscos cambios de humor (tales como enfados, risas, preocupaciones...) sin motivo especial para ello:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. De vez en cuando" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 69,
+        text: "Hay días en que mi cabeza no trabaja con tanta claridad como otros:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 70,
+        text: "Si me despidieran de un trabajo, buscaría otro:",
+        options: [
+            { id: "a", text: "A. Basándome en mi propia valía personal" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Apoyándome en las recomendaciones de mis amigos" }
+        ]
+    },
+    {
+        number: 71,
+        text: "Creo que el número correcto que sigue a la serie 2 1 4 3 8 5 es:",
+        options: [
+            { id: "a", text: "A. 16" },
+            { id: "b", text: "B. 10" },
+            { id: "c", text: "C. 7" }
+        ]
+    },
+    {
+        number: 72,
+        text: "De vez en cuando he tenido momentos de malestar, vértigo o ligero dolor de cabeza sin motivo aparente:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. No estoy seguro" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 73,
+        text: "Prefiero quedarme sin algo a llamar de nuevo a un camarero:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. De vez en cuando" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 74,
+        text: "Vivo el presente más que la mayoría de la gente:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 75,
+        text: "En mi armario:",
+        options: [
+            { id: "a", text: "A. Me gusta colocar cada cosa en su sitio" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Me limito a guardarlas dentro" }
+        ]
+    },
+    {
+        number: 76,
+        text: "Si hiciera una excursión al campo:",
+        options: [
+            { id: "a", text: "A. Iría delante abriendo camino" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Marcharía charlando con el grupo" }
+        ]
+    },
+    {
+        number: 77,
+        text: "De haber vivido en ese entonces, me hubiera gustado ser amigo de:",
+        options: [
+            { id: "a", text: "A. Cristóbal Colón" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Lope de Vega" }
+        ]
+    },
+    {
+        number: 78,
+        text: "Tengo que controlarme para evitarme líos intentando solucionar problemas de los demás:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A veces" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 79,
+        text: "En una tienda o supermercado, preferiría:",
+        options: [
+            { id: "a", text: "A. Decorar o distribuir los estantes" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Ser el cajero" }
+        ]
+    },
+    {
+        number: 80,
+        text: "Aunque la gente piense mal de mí, no me importa, yo voy a lo mío:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 81,
+        text: "Si de repente un buen amigo mío me trata con frialdad y reserva:",
+        options: [
+            { id: "a", text: "A. Pienso 'Hoy está de mal humor'" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Me preocupo por saber que le habré hecho yo" }
+        ]
+    },
+    {
+        number: 82,
+        text: "Es peor para todos:",
+        options: [
+            { id: "a", text: "A. Romper tradiciones antiguas" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Destruir ideas o métodos nuevos" }
+        ]
+    },
+    {
+        number: 83,
+        text: "Me agrada mucho charlar con la gente sobre temas locales o regionales:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A veces" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 84,
+        text: "A gente formal o estricta se suele llevar mal conmigo:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. A veces" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 85,
+        text: "Creo que me enfado menos que la mayoría de la gente:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 86,
+        text: "Tal vez soy menos atento con otras personas que ellas conmigo:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 87,
+        text: "Prefiero dejar a otro las preocupaciones de dirigir el grupo en que estoy:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 88,
+        text: "Sí, según la hora oficial, las dos manecillas de mi reloj se juntan cada 65 minutos el mío:",
+        options: [
+            { id: "a", text: "A. Se atrasa" },
+            { id: "b", text: "B. Es exacto" },
+            { id: "c", text: "C. Se adelanta" }
+        ]
+    },
+    {
+        number: 89,
+        text: "Yo estoy aburrido:",
+        options: [
+            { id: "a", text: "A. Frecuente" },
+            { id: "b", text: "B. De vez en cuando" },
+            { id: "c", text: "C. Raras veces" }
+        ]
+    },
+    {
+        number: 90,
+        text: "La gente dice que me gusta que las cosas se hagan a mi modo:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. De vez en cuando" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 91,
+        text: "Evito excitarme demasiado, ya que me perjudica:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. De vez en cuando" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 92,
+        text: "En casa, cuando tengo un rato libre, prefiero:",
+        options: [
+            { id: "a", text: "A. Charlar o descansar" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Aprovecharlo haciendo algo útil" }
+        ]
+    },
+    {
+        number: 93,
+        text: "Soy tímido y precavido al hacer nuevas amistades:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. De vez en cuando" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 94,
+        text: "Me dice y me gusta más:",
+        options: [
+            { id: "a", text: "A. Una novela" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. Un libro de poesías" }
+        ]
+    },
+    {
+        number: 95,
+        text: "Cuando la gente me trata amistosamente a la cara, sospecho que puede traicionarme por la espalda:",
+        options: [
+            { id: "a", text: "A. Generalmente sí" },
+            { id: "b", text: "B. De vez en cuando" },
+            { id: "c", text: "C. No, raras veces" }
+        ]
+    },
+    {
+        number: 96,
+        text: "Creo que, incluso las experiencias más duras vividas durante el año pasado, han cambiado mi manera de ser:",
+        options: [
+            { id: "a", text: "A. Verdadero" },
+            { id: "b", text: "B. A veces" },
+            { id: "c", text: "C. Falso" }
+        ]
+    },
+    {
+        number: 97,
+        text: "Para mí sería más interesante ser:",
+        options: [
+            { id: "a", text: "A. Jardinero o granjero" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Agente de seguros o contable" }
+        ]
+    },
+    {
+        number: 98,
+        text: "Me dominan ciertos miedos o malestares por cosas tales como la presencia de animales, ciertos lugares o cosas así:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A veces" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 99,
+        text: "Me gusta pensar en nuevos sistemas para mejorar las cosas de este mundo:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A medias" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 100,
+        text: "Prefiero aquellos juegos en que:",
+        options: [
+            { id: "a", text: "A. Las jugadas son en equipo" },
+            { id: "b", text: "B. No sé" },
+            { id: "c", text: "C. Cada uno haga lo suyo" }
+        ]
+    },
+    {
+        number: 101,
+        text: "Por la noche suelo tener sueños fantásticos y sin sentido:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. De vez en cuando" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 102,
+        text: "Si me quedo solo, en una casa aislada, al rato empiezo a sentir miedo:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A veces" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 103,
+        text: "Puedo engañar a los demás, siendo amable con ellos, cuando en realidad me desagradan:",
+        options: [
+            { id: "a", text: "A. Sí" },
+            { id: "b", text: "B. A veces" },
+            { id: "c", text: "C. No" }
+        ]
+    },
+    {
+        number: 104,
+        text: "¿Cuál de las siguientes palabras es diferente de las otras dos?:",
+        options: [
+            { id: "a", text: "A. Pensar" },
+            { id: "b", text: "B. Ver" },
+            { id: "c", text: "C. Oír" }
+        ]
+    },
+    {
+        number: 105,
+        text: "Si la madre de María es hermana del padre de Antonio, la madre de Antonio es:",
+        options: [
+            { id: "a", text: "A. Prima de María" },
+            { id: "b", text: "B. Tía de María" },
+            { id: "c", text: "C. Sobrina de María" }
+        ]
+    }
+];
+
+let currentQuestion = 0;
+const answers = {};
+
+window.onload = function() {
+    // Ocultar todas las páginas excepto la intro
+    document.getElementById('questionPage').style.display = 'none';
+    document.getElementById('resultsPage').style.display = 'none';
+    document.getElementById('introPage').style.display = 'block';
+}
+
+function startTest() {
+    document.getElementById('introPage').style.display = 'none';
+    document.getElementById('questionPage').style.display = 'block';
+    document.getElementById('resultsPage').style.display = 'none';
+    showQuestion();
+}
+
+function showQuestion() {
+    const question = questions[currentQuestion];
+    document.getElementById('questionNumber').textContent = `Pregunta ${question.number} de ${questions.length}`;
+    
+    // Contar respuestas B actuales
+    const bCount = Object.values(answers).filter(a => a === 'b').length;
+    document.getElementById('questionNumber').textContent += ` (Contador "B" : ${bCount}/10)`;
+    
+    document.getElementById('questionText').textContent = question.text;
+    
+    const optionsContainer = document.getElementById('optionsContainer');
+    optionsContainer.innerHTML = '';
+    question.options.forEach(option => {
+        const button = document.createElement('button');
+        button.className = 'option-button';
+        button.onclick = () => selectOption(option.id);
+        button.textContent = option.text;
+        optionsContainer.appendChild(button);
+    });
+
+    document.getElementById('progressFill').style.width = 
+        `${(currentQuestion + 1) / questions.length * 100}%`;
+    
+    document.getElementById('nextButton').disabled = !answers[question.number];
+}
+
+function selectOption(optionId) {
+    const buttons = document.getElementsByClassName('option-button');
+    Array.from(buttons).forEach(button => button.classList.remove('selected'));
+    
+    const selectedButton = Array.from(buttons).find(
+        button => button.textContent.startsWith(optionId.toUpperCase() + ".")
+    );
+    if (selectedButton) {
+        selectedButton.classList.add('selected');
+    }
+    
+    answers[questions[currentQuestion].number] = optionId;
+    document.getElementById('nextButton').disabled = false;
+}
+
+function calculateQuestionScore(questionNumber, answer) {
+    if (answer === 'b') return 1;
+    const twoPointAnswer = twoPointAnswers[questionNumber];
+    return answer.toUpperCase() === twoPointAnswer ? 2 : 0;
+}
+
+function nextQuestion() {
+    if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        showQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function getAnswerText(questionNumber, answerId) {
+    const question = questions.find(q => q.number === questionNumber);
+    const option = question.options.find(opt => opt.id === answerId);
+    return option.text.substring(option.text.indexOf('.') + 2); // Elimina "A. ", "B. ", "C. "
+}
+
+function calculateCorrectAnswer(questionNumber, answer) {
+    const twoPointAnswer = twoPointAnswers[questionNumber];
+    if (answer.toUpperCase() === twoPointAnswer) {
+        return {correct: true, points: 2, expectedAnswer: twoPointAnswer};
+    } else if (answer === 'b') {
+        return {correct: true, points: 1, expectedAnswer: 'B'};
+    }
+    return {correct: false, points: 0, expectedAnswer: twoPointAnswer};
+}
+
+function showResults() {
+    // Ocultar página de preguntas
+    document.getElementById('questionPage').style.display = 'none';
+    
+    // Mostrar página de resultados
+    document.getElementById('resultsPage').style.display = 'block';
+    
+    // Obtener el contenedor de resultados
+    const resultsContainer = document.getElementById('resultsContainer');
+    if (!resultsContainer) {
+        console.error('No se encontró el contenedor de resultados');
+        return;
+    }
+    
+    // Limpiar resultados anteriores
+    resultsContainer.innerHTML = '';
+    
+    // Calcular puntuaciones totales
+    let totalScore = 0;
+    let totalAnswers = Object.keys(answers).length;
+    let bAnswers = Object.values(answers).filter(a => a === 'b').length;
+    
+    // Crear contenedor de resumen
+    const summaryDiv = document.createElement('div');
+    summaryDiv.style.backgroundColor = '#f0f0f0';
+    summaryDiv.style.padding = '20px';
+    summaryDiv.style.marginBottom = '20px';
+    summaryDiv.style.borderRadius = '8px';
+    
+    // Verificar si todas las escalas son válidas
+    const allScalesValid = Object.entries(scales).every(([scaleKey, scale]) => {
+        let scaleScore = 0;
+        scale.questions.forEach(questionNum => {
+            if (answers[questionNum]) {
+                scaleScore += calculateQuestionScore(questionNum, answers[questionNum]);
+            }
+        });
+        return scaleScore >= scale.validRange.min && 
+               (scale.validRange.max === Infinity || scaleScore <= scale.validRange.max);
+    });
+
+    // Verificar todos los criterios
+    const isTestValid = allScalesValid && bAnswers <= 10;
+
+    // Añadir resumen general con estado
+    summaryDiv.innerHTML = `
+        <h3 style="margin-bottom: 15px;">Resumen General</h3>
+        <div style="margin-bottom: 20px; text-align: center;">
+            <div style="
+                font-size: 24px;
+                font-weight: bold;
+                color: ${isTestValid ? '#22c55e' : '#ef4444'};
+                padding: 10px;
+                border: 2px solid ${isTestValid ? '#22c55e' : '#ef4444'};
+                border-radius: 8px;
+                display: inline-block;
+                margin-bottom: 20px;
+            ">
+                ${isTestValid ? 'APTO' : 'NO APTO'}
+            </div>
+        </div>
+        <div style="margin-bottom: 10px">Total de respuestas: ${totalAnswers}</div>
+        <div style="margin-bottom: 10px">Respuestas B ("?"): ${bAnswers} de 15 ${bAnswers <= 10 ? '✅' : '❌'}</div>
+        <div style="margin-bottom: 10px">Escalas válidas: ${allScalesValid ? '✅' : '❌'}</div>
+    `;
+    
+    resultsContainer.appendChild(summaryDiv);
+    
+    // Procesar cada escala
+    Object.entries(scales).forEach(([scaleKey, scale]) => {
+        let scaleScore = 0;
+        const scaleResponses = [];
+        
+        // Calcular puntuación de la escala
+        scale.questions.forEach(questionNum => {
+            if (answers[questionNum]) {
+                const score = calculateQuestionScore(questionNum, answers[questionNum]);
+                scaleScore += score;
+                totalScore += score;
+                
+                // Guardar respuesta
+                scaleResponses.push({
+                    question: questionNum,
+                    answer: answers[questionNum],
+                    score: score
+                });
+            }
+        });
+        
+        // Determinar si la escala es válida
+        const isValid = scaleScore >= scale.validRange.min && 
+            (scale.validRange.max === Infinity || scaleScore <= scale.validRange.max);
+        
+        // Crear elemento para la escala
+        const scaleDiv = document.createElement('div');
+        scaleDiv.style.border = '1px solid #ddd';
+        scaleDiv.style.padding = '15px';
+        scaleDiv.style.marginBottom = '15px';
+        scaleDiv.style.backgroundColor = isValid ? '#f0fff4' : '#fff5f5';
+        
+        // Añadir contenido de la escala
+        scaleDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <strong>${scale.name}</strong>
+                <span style="color: ${isValid ? 'green' : 'red'}">${isValid ? 'APTO' : 'NO APTO'}</span>
+            </div>
+            <div>Puntuación: ${scaleScore}</div>
+            <div>Rango requerido: ${scale.validRange.min} - ${scale.validRange.max === Infinity ? '∞' : scale.validRange.max}</div>
+            
+            <table style="width: 100%; margin-top: 10px; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Pregunta</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Respuesta</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Puntos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${scaleResponses.map(resp => {
+                        const question = questions.find(q => q.number === resp.question);
+                        return `
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${resp.question}. ${question ? question.text : ''}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${resp.answer.toUpperCase()} - ${getAnswerText(resp.question, resp.answer)}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${resp.score}</td>
+                        </tr>
+                    `}).join('')}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" style="border: 1px solid #ddd; padding: 8px;"><strong>Total:</strong></td>
+                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;"><strong>${scaleScore}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        `;
+        
+        resultsContainer.appendChild(scaleDiv);
+    });
+    
+    // Actualizar el resumen con la puntuación total
+    summaryDiv.innerHTML += `
+        <div style="margin-top: 15px; font-weight: bold;">Puntuación total: ${totalScore}</div>
+    `;
+}
+    </script>
+</body>
+</html>
