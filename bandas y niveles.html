@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Conocimiento Organizativo</title>
+    <style>
+        /* Reset y variables CSS */
+        :root {
+            --primary-color: #1a73e8;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --background-color: #f0f2f5;
+            --text-color: #333;
+            --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Estilos base responsivos */
+        html {
+            font-size: 16px;
+            /* Base para rem */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 1rem;
+            min-height: 100vh;
+        }
+
+        /* Contenedor principal con media queries */
+        .container {
+            max-width: 90%;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 750px;
+                padding: 2rem;
+            }
+        }
+
+        /* Título responsivo */
+        .title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--text-color);
+        }
+
+        @media (min-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+        }
+
+        /* Score container responsivo */
+        .score-container {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* Preguntas responsivas */
+        .question-container {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (min-width: 768px) {
+            .question-container {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        /* Opciones responsivas */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .option-button {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f8f9fa;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+            /* Mejora para táctil */
+        }
+
+        .option-button:hover {
+            background: #e9ecef;
+        }
+
+        /* Estilos de respuesta adaptados para móvil */
+        .correct {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .incorrect {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        /* Explicación responsiva */
+        .explanation {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        .explanation.correct {
+            background-color: rgba(40, 167, 69, 0.1);
+            border: 1px solid #c3e6cb;
+        }
+
+        .explanation.incorrect {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Ajustes táctiles para móvil */
+        @media (max-width: 768px) {
+            .option-button {
+                padding: 1rem;
+                /* Botones más grandes para táctil */
+                min-height: 44px;
+                /* Altura mínima para táctil */
+            }
+
+            .question-container {
+                padding: 1rem;
+            }
+
+            .explanation {
+                font-size: 0.9rem;
+                padding: 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="title">Test de Bandas👥 y Niveles💼</h1>
+        <div class="score-container">
+            Puntuación: <span id="score">0</span> de <span id="total">0</span>
+        </div>
+        <div id="quiz-container"></div>
+    </div>
+
+    <script>
+        // Base de preguntas
+        const questions = [
+            {
+
+                id: 1,
+                question: "¿Cuántos grupos principales se mencionan en la estructura organizativa?",
+                options: [
+                    "Grupos I y II",
+                    "Grupos II y III",
+                    "Grupos I y III",
+                    "Grupos III y IV"
+                ],
+                correct: 1,
+                explanation: "La estructura menciona el Grupo II (Responsables y Técnicos) y el Grupo III (Profesionales)"
+            },
+            {
+                id: 2,
+                question: "¿Cuántas bandas tiene el Grupo II?",
+                options: [
+                    "Una banda",
+                    "Dos bandas",
+                    "Tres bandas",
+                    "Cuatro bandas"
+                ],
+                correct: 1,
+                explanation: "El Grupo II tiene dos bandas: Banda I (Responsables) y Banda II (Técnicos)"
+            },
+            {
+                id: 3,
+                question: "¿Qué niveles comprende la Banda I del Grupo II?",
+                options: [
+                    "Niveles 1 al 6",
+                    "Niveles 1 al 7",
+                    "Niveles 1 al 8",
+                    "Niveles 1 al 9"
+                ],
+                correct: 2,
+                explanation: "La Banda I del Grupo II (Responsables) comprende los niveles del 1 al 8"
+            },
+            {
+                id: 4,
+                question: "¿Qué posición corresponde a la Banda I del Grupo III?",
+                options: [
+                    "Técnicos",
+                    "Responsables",
+                    "Ocupaciones Profesionales",
+                    "Jefes de Equipo y Patrón Tráfico Interior"
+                ],
+                correct: 3,
+                explanation: "La Banda I del Grupo III corresponde a Jefes de Equipo y Patrón Tráfico Interior"
+            },
+            {
+                id: 5,
+                question: "¿Cuántos niveles tiene la Banda II del Grupo III?",
+                options: [
+                    "5 niveles",
+                    "6 niveles",
+                    "7 niveles",
+                    "8 niveles"
+                ],
+                correct: 2,
+                explanation: "La Banda II del Grupo III (Ocupaciones Profesionales) tiene niveles del 1 al 7"
+            },
+            {
+                id: 6,
+                question: "¿Qué bandas tienen más niveles?",
+                options: [
+                    "Las bandas del Grupo II",
+                    "Las bandas del Grupo III",
+                    "Las bandas del Grupo IV",
+                    "Todas tienen el mismo número de niveles"
+                ],
+                correct: 0,
+                explanation: "Las bandas del Grupo II (tanto Banda I como Banda II) tienen 8 niveles, mientras que las bandas del Grupo III tienen 7 niveles."
+            },
+            {
+                id: 7,
+                question: "¿Qué categoría corresponde a la Banda II del Grupo II?",
+                options: [
+                    "Responsables",
+                    "Técnicos",
+                    "Jefes de Equipo",
+                    "Ocupaciones Profesionales"
+                ],
+                correct: 1,
+                explanation: "La Banda II del Grupo II corresponde a Técnicos"
+            },
+            {
+                id: 8,
+                question: "¿Cuál es la diferencia en niveles entre los Grupos II y III?",
+                options: [
+                    "No hay diferencia",
+                    "1 nivel",
+                    "2 niveles",
+                    "3 niveles"
+                ],
+                correct: 1,
+                explanation: "El Grupo II tiene 8 niveles mientras que el Grupo III tiene 7 niveles, la diferencia es de 1 nivel"
+            }
+            // Añade aquí el resto de preguntas...
+        ];
+
+        // Variables globales
+        let score = 0;
+        let answeredQuestions = new Set();
+
+        // Función para inicializar el quiz con soporte táctil
+        function initializeQuiz() {
+            const quizContainer = document.getElementById('quiz-container');
+            document.getElementById('total').textContent = questions.length;
+
+            questions.forEach(question => {
+                const questionElement = createQuestionElement(question);
+                quizContainer.appendChild(questionElement);
+            });
+
+            // Añadir soporte para eventos táctiles
+            document.addEventListener('touchstart', function () { }, { passive: true });
+        }
+
+        // Función para crear elementos de pregunta optimizada para móvil
+        function createQuestionElement(question) {
+            const questionContainer = document.createElement('div');
+            questionContainer.className = 'question-container';
+            questionContainer.id = `question-${question.id}`;
+
+            const questionText = document.createElement('div');
+            questionText.className = 'question-text';
+            questionText.textContent = `${question.id}. ${question.question}`;
+            questionContainer.appendChild(questionText);
+
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'options-container';
+
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.textContent = option;
+
+                // Añadir eventos para táctil y ratón
+                button.addEventListener('click', () => handleAnswer(question.id, index));
+                button.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    handleAnswer(question.id, index);
+                });
+
+                optionsContainer.appendChild(button);
+            });
+
+            questionContainer.appendChild(optionsContainer);
+
+            const explanation = document.createElement('div');
+            explanation.className = 'explanation';
+            explanation.id = `explanation-${question.id}`;
+            questionContainer.appendChild(explanation);
+
+            return questionContainer;
+        }
+
+        // Función mejorada para manejar respuestas
+        function handleAnswer(questionId, selectedIndex) {
+            if (answeredQuestions.has(questionId)) return;
+
+            const question = questions.find(q => q.id === questionId);
+            const isCorrect = selectedIndex === question.correct;
+            const questionContainer = document.getElementById(`question-${questionId}`);
+            const options = questionContainer.getElementsByClassName('option-button');
+            const explanation = document.getElementById(`explanation-${questionId}`);
+
+            // Deshabilitar todas las opciones después de responder
+            Array.from(options).forEach(option => {
+                option.disabled = true;
+                option.style.cursor = 'default';
+            });
+
+            options[selectedIndex].classList.add(isCorrect ? 'correct' : 'incorrect');
+            options[question.correct].classList.add('correct');
+
+            explanation.textContent = question.explanation;
+            explanation.classList.add(isCorrect ? 'correct' : 'incorrect');
+            explanation.style.display = 'block';
+
+            if (isCorrect) {
+                score++;
+                document.getElementById('score').textContent = score;
+            }
+
+            answeredQuestions.add(questionId);
+
+            // Scroll suave a la explicación en móviles
+            if (window.innerWidth <= 768) {
+                explanation.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', initializeQuiz);
+    </script>
+</body>
+
+</html>
