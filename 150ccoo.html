@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test 150 CCOO</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            min-height: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1a365d;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #000000;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #e2e8f0;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            line-height: 1.4;
+            font-weight: 600;
+            
+        }
+
+        .option-button {
+            padding: 15px 20px;
+            font-size: 1.1em;
+            background-color: #edf2f7;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .option-button:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        .option-button.selected {
+            background-color: #FFD700;
+            color: black;
+            border-color: #FFA500;
+        }
+
+        .option-button.correct {
+            background-color: #48bb78;
+            color: white;
+        }
+
+        .option-button.incorrect {
+            background-color: #f56565;
+            color: white;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .nav-button {
+            padding: 12px 24px;
+            font-size: 1.2em;
+            background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+            color: black;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(90deg, #FFA500 0%, #FF8C00 100%);
+        }
+
+        .nav-button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #results-section {
+            text-align: center;
+        }
+
+        .score-summary {
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+
+        #detailed-results {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .result-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #fff5f5;
+        }
+        #question {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            line-height: 1.4;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="quiz-section">
+            <h1>🏍️ MOTOS ACADEMY 🏍️</h1>
+            <h2>Test 150 CCOO</h2>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <div class="progress-info">
+                <span>Pregunta <span id="current-question">1</span> de <span id="total-questions">15</span></span>
+            </div>
+            <div id="question"></div>
+            <div id="options" class="options-container"></div>
+            <div class="navigation">
+                <button id="prev-btn" class="nav-button">Anterior</button>
+                <button id="shuffle-btn" class="nav-button">Mezclar</button>
+                <button id="next-btn" class="nav-button">Siguiente</button>
+            </div>
+        </div>
+
+        <div id="results-section" style="display: none;">
+            <h2>Resultados del Test</h2>
+            <div id="score"></div>
+            <div class="score-summary">
+                <p>Correctas: <span id="total-correct">0</span></p>
+                <p>Incorrectas: <span id="total-incorrect">0</span></p>
+                <p>Porcentaje: <span id="total-percentage">0</span>%</p>
+            </div>
+            <div id="detailed-results"></div>
+            <button id="restart-btn" class="nav-button">Reiniciar</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+  {
+    question: "L.P. Art.132 El valor de la cuantía básica (R1), para la tasa a la mercancía se establece en:",
+    options: [
+      "80 E",
+      "10 E",
+      "60 E",
+      "5 E"
+    ],
+    correct: 0
+  },
+  {
+    question: "R.E.P Art.50 Por norma general, ¿Quién deberá encargarse de la limpieza de la superficie que haya ocupado una mercancía?",
+    options: [
+      "La Empresa que haya solicitado su depósito",
+      "La Autoridad Portuaria",
+      "La Empresa Estibadora",
+      "La Naviera"
+    ],
+    correct: 0
+  },
+  {
+    question: "R.G.C Art.12 Excepcionalmente, podrán circular en motocicletas o ciclomotores conducidos por su padre, madre o tutor o por personas mayores de edad por ellos autorizadas:",
+    options: [
+      "Menores de 12 años",
+      "Los mayores de seis años",
+      "Los mayores de siete años",
+      "Menores de 10 años"
+    ],
+    correct: 2
+  },
+  {
+    question: "L.P Art.132 Por norma general, el pago de la tarifa fija de recepción de desechos generados por buques es obligatoria para todos los buques en cada escala que realicen en el puerto, con un máximo de:",
+    options: [
+      "Una vez cada quince días",
+      "Una vez cada veintiún días",
+      "Una vez cada siete días",
+      "Una vez cada mes"
+    ],
+    correct: 2
+  },
+  {
+    question: "RGC Art.11 ¿Cuál de las siguientes circunstancias no está prohibida en los vehículos destinados al servicio público de transporte colectivo de personas?",
+    options: [
+      "Distraer al conductor durante la marcha del vehículo",
+      "Dicultar innecesariamente el paso en los lugares destinados al tránsito de personas",
+      "Entrar en el vehículo cuando se haya hecho la advertencia de que está completo",
+      "Llevar consigo los invidentes perros, especialmente adiestrados como lazarillos"
+    ],
+    correct: 3
+  },
+  {
+    question: "REP Art.20 ¿A quién corresponderá la consideración de las circunstancias excepcionales que puedan ocurrir en cada momento, otorgando el atraque de la forma más conveniente para el servicio portuario?",
+    options: [
+      "Al Consejo Rector de Puertos del Estado",
+      "Al Consejo de Administración",
+      "Al Director del Puerto",
+      "Al Capitán Marítimo"
+    ],
+    correct: 2
+  },
+  {
+    question: "CP Art.417 La autoridad o funcionario público que revelare secretos o informaciones de los que tenga conocimiento por razón de su oficio o cargo y que no deberán ser divulgados, incurrirá en la pena de:",
+    options: [
+      "Multa de seis a dieciocho meses e inhabilitación especial para empleo o cargo público por tiempo de uno a tres años",
+      "Multa de doce a dieciocho meses e inhabilitación especial para empleo o cargo público por tiempo de uno a tres años",
+      "La pena de prisión de tres a nueve meses o con la de multa de seis a doce meses y con la de trabajos en benecio a la comunidad de treinta y uno a noventa días",
+      "La pena de prisión de tres a seis meses o con la de multa de seis a doce meses y con la de trabajos en benecio a la comunidad de treinta y uno a noventa días"
+    ],
+    correct: 1
+  },
+  {
+    question: "LP Art.132 Los buques de guerra, unidades navales auxiliares y otros buques que, siendo propiedad de un Estado de la Unión Europea o estando a su servicio, sólo presten servicios gubernamentales de carácter no comercial:",
+    options: [
+      "Estarán exentos del pago de la tarifa ja de recepción de desechos generados por buques",
+      "Pagarán el 20 % de la tarifa ja de recepción de desechos generados por buques",
+      "Estarán exentos del pago del 50% de la tarifa ja de recepción de desechos generados por buques",
+      "Estarán exentos del pago del 80% de la tarifa ja de recepción de desechos generados por buques"
+    ],
+    correct: 0
+  },
+  {
+    question: "RGC Art.15 En vehículos de longitud igual o inferior a 5 metros, destinados exclusivamente al transporte de mercancías, si se transportan vigas, postes, tubos u otras cargas de longitud indivisible que sobresalgan:",
+    options: [
+      "El tercio de la longitud del vehículo por cada extremo anterior y posterior",
+      "El cuarto de la longitud del vehículo por cada extremo anterior y posterior",
+      "El tercio de la longitud del vehículo por el extremo posterior",
+      "El cuarto de la longitud del vehículo por el extremo anterior"
+    ],
+    correct: 0
+  },
+  {
+    question: "REP Art.66 Si al finalizar un expediente se impusiera sanción económica, ésta deberá ser ingresada en la Caja del Puerto Autónomo, en metálico, por giro postal o con talón conformado en el plazo de:",
+    options: [
+      "15 días, contados desde el mismo día de recibo de la noticación de la resolución",
+      "15 días, contados desde el siguiente al de recibo de la noticación de la resolución",
+      "30 días, contados desde el siguiente al de recibo de la noticación de la resolución",
+      "10 días, contados desde el siguiente al de recibo de la noticación de la resolución"
+    ],
+    correct: 1
+  },
+  {
+    question: "LP Art.66 La infracción de las normas sobre utilización de estaciones y servicios radioeléctricos por los buques se considera una infracción:",
+    options: [
+      "Muy grave",
+      "Leve",
+      "Grave",
+      "Moderada"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.161 ¿Cuál de las siguientes se considera 'tasa portuaria'?",
+    options: [
+      "Tasa a la pesca fresca",
+      "Tasa a la mercancía",
+      "Tasa de ayudas a la navegación",
+      "Tasa al pasaje"
+    ],
+    correct: 2
+  },
+  {
+    question: "CP Art.379 El que condujere un vehículo de motor a velocidad superior en 60 kilómetros por hora en vía urbana la permitida reglamentariamente, será castigado con:",
+    options: [
+      "La pena de prisión de tres a nueve meses o con la de multa de seis a doce meses o con la de trabajos en benecio a la comunidad de treinta y uno a noventa días",
+      "La pena de prisión de tres a doce meses o con la de multa de seis a doce meses o con la de trabajos en benecio a la comunidad de treinta y uno a cien días",
+      "La pena de prisión de tres a seis meses o con la de multa de seis a doce meses o con la de trabajos en benecio a la comunidad de treinta y uno a noventa días",
+      "La pena de prisión de tres meses a un año o con la de multa de nueve a doce meses o con la de trabajos en benecio a la comunidad de treinta y uno a noventa días"
+    ],
+    correct: 2
+  },
+  {
+    question: "REP Art.53 Cuando la utilización de terrenos o instalaciones se solicite conjuntamente para las mercancías correspondientes a más de un barco y exista tarifa específica para ello, se autorizará la utilización por un plazo:",
+    options: [
+      "No inferior a seis meses, ni superior a un año",
+      "No inferior a dos meses, ni superior a un año",
+      "No inferior a dos meses, ni superior a seis meses",
+      "No inferior a tres meses, ni superior a un año"
+    ],
+    correct: 3
+  },
+  {
+    question: "RGC Art.18 La instalación de mecanismos o sistemas, o llevar instrumentos de forma encaminada a eludir la vigilancia de los agentes de tráfico, o que se emitan o hagan señales con dicha finalidad, así como la utilización de mecanismos de detección de radar, se considera una:",
+    options: [
+      "Infracción grave",
+      "Infracción leve",
+      "Infracción muy grave",
+      "Falta grave"
+    ],
+    correct: 0
+  },
+  {
+    question: "LP Art.163 ¿Quién establecerá por Orden Ministerial los criterios por los cuales se considerará que los rendimientos, de las 'tasas portuarias' son razonables?",
+    options: [
+      "Ministerio de Economía",
+      "Puertos del Estado",
+      "Ministerio de Fomento",
+      "Autoridades portuarias"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.306 El incumplimiento de las ordenanzas establecidas o instrucciones dadas por la Autoridad Portuaria en relación con las operaciones marítimas en el ámbito del puerto. Se considera una infracción:",
+    options: [
+      "Grave",
+      "Muy grave",
+      "Leve",
+      "Moderada"
+    ],
+    correct: 2
+  },
+  {
+    question: "REP Art.44 Una vez incautadas las mercancías u objetos por el Puerto Autónomo, éste publicará un Edicto en el Boletín Oficial de la Provincia. ¿Cuál será el plazo fijado para que el dueño o consignatario de la mercancía pueda reclamarla y abonar los débitos?",
+    options: [
+      "Un plazo de treinta días",
+      "Un plazo de diez días",
+      "Un plazo de quince días",
+      "Un plazo de sesenta días"
+    ],
+    correct: 2
+  },
+  {
+    question: "CP Art.442 A la autoridad o funcionario público que, a sabiendas de su injusticia, dictare una resolución arbitraria en un asunto administrativo se le castigará con la pena de:",
+    options: [
+      "Inhabilitación especial para empleo o cargo público y para el ejercicio del derecho de sufragio pasivo por tiempo de seis a quince años",
+      "Inhabilitación especial para empleo o cargo público y para el ejercicio del derecho de sufragio pasivo por tiempo de cinco a quince años",
+      "Inhabilitación especial para empleo o cargo público y para el ejercicio del derecho de sufragio pasivo por tiempo de nueve a quince años",
+      "Inhabilitación especial para empleo o cargo público y para el ejercicio del derecho de sufragio pasivo por tiempo de cinco a diez años"
+    ],
+    correct: 1
+  },
+  {
+    question: "LP Art.164 El importe de la tasa de actividad se fijará:",
+    options: [
+      "Tomando como referencia el valor de mercado correspondiente al bien de dominio público portuario ocupado",
+      "Tomando como referencia la utilidad derivada del aprovechamiento del dominio público para el usuario",
+      "Tomando en consideración la utilidad derivada de la utilización de las infraestructuras portuarias y además tendrá en cuenta los costes directos e indirectos asociados a la dotación y mantenimiento de las infraestructuras portuarias",
+      "Tomando en consideración los costes directos e indirectos asociados a la dotación y adecuado mantenimiento del conjunto de instalaciones de ayuda a la navegación marítima en el litoral marítimo español"
+    ],
+    correct: 1
+  },
+  {
+    question: "RGC Art.71 Durante la circulación, los conductores de vehículos especiales o en régimen de transporte especial deberán utilizar la señal luminosa tanto de día como de noche, siempre que circulen por vías de uso público a una velocidad que no supere los:",
+    options: [
+      "50 km/h",
+      "40 km/h",
+      "70 km/h",
+      "60 km/h"
+    ],
+    correct: 1
+  },
+  {
+    question: "LP Art. 309 El plazo de prescripción de las infracciones graves será de:",
+    options: [
+      "2 años",
+      "3 años",
+      "1 año",
+      "5 años"
+    ],
+    correct: 1
+  },
+  {
+    question: "LP Art.265 La Comisión Permanente de Investigación de Accidentes e Incidentes Marítimos publicará un informe, incluidas sus conclusiones y cualquier posible recomendación, que estará a disposición del público y, muy especialmente, de todo el sector marítimo en el plazo de:",
+    options: [
+      "Doce meses a partir de la fecha del siniestro",
+      "Seis meses a partir de la fecha del siniestro",
+      "Tres meses a partir de la fecha del siniestro",
+      "Nueve meses a partir de la fecha del siniestro"
+    ],
+    correct: 0
+  },
+  {
+    question: "REP Art.21 Cuando un buque esté efectuando operaciones de carga o descarga y avise que a su terminación va a efectuar operaciones de descarga o carga en otro muelle, se considerará, a los efectos de su turno para el nuevo muelle, como si hubiera entrado en puerto:",
+    options: [
+      "Tres horas antes de haber terminado la primera operación",
+      "Cuatro horas antes de haber terminado la primera operación",
+      "Dos horas antes de haber terminado la primera operación",
+      "Una hora antes de haber terminado la primera operación"
+    ],
+    correct: 2
+  },
+  {
+    question: "CP Art.203 ¿Con qué pena será castigado el que entrare contra la voluntad de su titular en el domicilio de una persona jurídica pública o privada, despacho profesional u oficina, o en establecimiento mercantil o local abierto al público fuera de las horas de apertura?",
+    options: [
+      "Seis meses a un año y multa de seis a diez meses",
+      "Tres meses a un año y multa de seis a diez meses",
+      "Seis meses a un año y multa de seis a doce meses",
+      "Multa de seis a diez meses"
+    ],
+    correct: 1
+  },
+  {
+    question: "LP Art.265 La Comisión Permanente de Investigación de Accidentes e Incidentes Marítimos (CIAIM) es el órgano colegiado, con competencia para la investigación de las causas técnicas de los accidentes e incidentes marítimos, y está adscrito:",
+    options: [
+      "Al Ministerio de Fomento",
+      "Al Ministerio de Interior",
+      "A Puertos del Estado",
+      "Dirección General de la Marina Mercante"
+    ],
+    correct: 0
+  },
+  {
+    question: "RGC Art.15 Cuando el vehículo circule entre la puesta y la salida del sol o bajo condiciones meteorológicas o ambientales que disminuyan sensiblemente la visibilidad, la carga que sobresalga por la parte delantera, deberá ir señalizada:",
+    options: [
+      "Con una luz roja",
+      "Con una luz blanca",
+      "Con una luz amarilla",
+      "Con un trapo rojo"
+    ],
+    correct: 1
+  },
+  {
+    question: "REP Art.36 ¿Quién podrá ordenar el traslado de las mercancías por cuenta y riesgo del usuario, cuando las mercancías se hayan depositado sin solicitud y autorización previa?:",
+    options: [
+      "La Comisaría de Explotación",
+      "La Dirección del Puerto",
+      "Capitanía Marítima",
+      "El Servicio de Prácticos"
+    ],
+    correct: 1
+  },
+  {
+    question: "LP Art.283 ¿Cuál de las siguientes tasas no se considera tasa por actuaciones registrales?",
+    options: [
+      "Tasa de inscripción",
+      "Tasa de baja",
+      "Tasa de alta",
+      "Tasa de actuaciones administrativas intermedias"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.307 La falta de comunicación por los interesados a la Capitanía Marítima más próxima, salvo causa justificada del cese de la situación de peligro de un buque o plataforma fija que hubiera consentido a petición de socorro. Se considera una infracción:",
+    options: [
+      "Leve",
+      "Muy grave",
+      "Grave",
+      "Moderada"
+    ],
+    correct: 1
+  },
+  {
+    question: "RGC Art.379 El que condujere un vehículo de motor o un ciclomotor a velocidad superior en ochenta kilómetros por hora en vía interurbana a la permitida reglamentariamente, será castigado con:",
+    options: [
+      "La pena de prisión de tres a nueve meses o con la de multa de seis a doce meses o con la de trabajos en benecio de la comunidad de treinta y uno a noventa días",
+      "La pena de prisión de tres a doce meses o con la de multa de seis a doce meses o con la de trabajos en benecio de la comunidad de treinta y uno a cien días",
+      "La pena de prisión de tres a seis meses o con la de multa de seis a doce meses o con la de trabajos en benecio de la comunidad de treinta y uno a noventa días",
+      "La pena de prisión de tres meses a un año o con la de multa de nueve a doce meses o con la de trabajos en benecio de la comunidad de treinta y uno a noventa días"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.81 La ocupación por particulares de terrenos de las Zonas de Servicio de los puertos por un plazo superior a tres años, o que requieran la construcción de obras o instalaciones de carácter permanente, así como la utilización de instalaciones o equipo del Puerto Autónomo por un plazo superior a tres años será objeto de la correspondiente:",
+    options: [
+      "Licencia",
+      "Autorización",
+      "Permiso",
+      "Concesión"
+    ],
+    correct: 3
+  },
+  {
+    question: "RGC Art.70 Si, como consecuencia de circunstancias especialmente graves, el conductor de un vehículo no prioritario se viera forzado, sin poder recurrir a otro medio, a efectuar un servicio de los normalmente reservados a los prioritarios, podría saltarse alguna norma del código de circulación:",
+    options: [
+      "Sí",
+      "Sólo las referentes a las intersecciones",
+      "No, ninguna",
+      "Solo las referentes a preferencia de paso"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.310 En las infracciones cometidas con ocasión de la navegación marítima de buques mercantes, quien será el responsable:",
+    options: [
+      "La empresa naviera titular de la actividad o, en su defecto, el consignatario del buque",
+      "El consignatario, o en su defecto el capitán del buque",
+      "La empresa naviera titular de la actividad o, en su defecto, el capitán del buque",
+      "El capitán del buque, o en su defecto el segundo de abordo"
+    ],
+    correct: 2
+  },
+  {
+    question: "CP Art.442 El funcionario público que siendo autoridad, jefe o responsable de una fuerza pública o un agente de la autoridad, requerido por autoridad competente, no prestare el auxilio debido para la administración de justicia u otro servicio público, incurrirá en las penas de:",
+    options: [
+      "Multa de doce a dieciséis meses y suspensión de empleo o cargo público por tiempo de uno a tres años",
+      "Multa de doce a dieciocho meses y suspensión de empleo o cargo público por tiempo de uno a tres años",
+      "Multa de doce a dieciocho meses y suspensión de empleo o cargo público por tiempo de dos a tres años",
+      "Multa de seis a doce meses y suspensión de empleo o cargo público por tiempo de dos a tres años"
+    ],
+    correct: 2
+  },
+  {
+    question: "REP Art.37 Cuando una mercancía se deposite de forma que queden zonas desaprovechadas entre dicho depósito y los contiguos:",
+    options: [
+      "No se incluirán en la medición las supercies perdidas, para su posterior cobro",
+      "Se incluirán en la medición las supercies perdidas, para su posterior cobro",
+      "Se incluirán en la medición la mitad de las supercies perdidas, para su posterior cobro",
+      "Se incluirán en la medición un cuarto de las supercies perdidas, para su posterior cobro"
+    ],
+    correct: 1
+  },
+  {
+    question: "LP Art.307 Incumplir las normas sobre despacho de buques y embarcaciones o sobre enrolamiento de tripulaciones y régimen del rol ante las Capitanías Marítimas y oficinas consulares, se considera una infracción:",
+    options: [
+      "Grave",
+      "Leve",
+      "Muy grave",
+      "Moderada"
+    ],
+    correct: 0
+  },
+  {
+    question: "LP Art.312 Las infracciones graves por contaminación del medio marino, se sancionarán con una multa de hasta:",
+    options: [
+      "600.000 euros",
+      "120.000 euros",
+      "601.000 euros",
+      "180.000 euros"
+    ],
+    correct: 2
+  },
+  {
+    question: "CP Art.202 El particular que, sin habitar en ella, entrare en morada ajena o se mantuviere en la misma contra la voluntad de su morador, ejecutando el hecho con violencia o intimidación, será castigado con la pena de prisión de:",
+    options: [
+      "Uno a cuatro años",
+      "Dos a cuatro años",
+      "Seis meses a dos años",
+      "Uno a tres años"
+    ],
+    correct: 0
+  },
+  {
+    question: "LP Art.307 La evacuación negligente en aguas situadas en zonas en las que España ejerce soberanía, derechos soberanos o jurisdicción, de desechos u otras sustancias desde buques, plataformas fijas u otras construcciones en la mar cuando se produzca en contravención de la legislación vigente sobre la materia, se considera una infracción:",
+    options: [
+      "Leve",
+      "Moderada",
+      "Muy Grave",
+      "Grave"
+    ],
+    correct: 3
+  },
+  {
+    question: "LP Art. 308 El incumplimiento de las normas o resoluciones de las Autoridades Marítimas en relación con la instalación y el desarrollo de actividades desde plataformas fijas que se encuentren en aguas situadas en zonas en las que España ejerce soberanía, derechos soberanos o jurisdicción, cuando se ponga en peligro la seguridad marítima. Se considera una infracción:",
+    options: [
+      "Muy grave",
+      "Grave",
+      "Moderada", 
+      "Leve"
+    ],
+    correct: 0
+  },
+  {
+    question: "CP Art.202 El particular que, sin habitar en ella, entrare en morada ajena o se mantuviere en la misma contra la voluntad de su morador, será castigado con la pena de prisión de:",
+    options: [
+      "Seis meses a dos años",
+      "Nueve meses a dos años",
+      "Un año a dos años",
+      "Dos años a tres años"
+    ],
+    correct: 0
+  },
+  {
+    question: "RGC Art.61 En caso de encuentro de dos vehículos que no se puedan cruzar en puentes u obras de paso en uno de cuyos extremos se hubiera colocado la señal de prioridad en sentido contrario o la de ceda el paso, el que llegue por ese extremo habrá de:",
+    options: [
+      "Pasar lo antes posible",
+      "Pararse",
+      "Retroceder para dejar paso al otro",
+      "Ninguna de las anteriores es correcta"
+    ],
+    correct: 2
+  },
+  {
+    question: "REP Art.35 En general la carga sobre la superficie de los muelles no deberá exceder de:",
+    options: [
+      "5 Tm/m²",
+      "4 Tm/m²",
+      "10 Tm/m²",
+      "6 Tm/m²"
+    ],
+    correct: 1
+  },
+  {
+    question: "LP Art.307 La infracción de las normas reglamentarias sobre desguace de los buques y sobre destrucción o abandono de las plataformas fijas en aguas situadas en zonas en las que España ejerce soberanía, derechos soberanos o jurisdicción. Se considera una infracción:",
+    options: [
+      "Leve",
+      "Muy grave",
+      "Grave",
+      "Moderada"
+    ],
+    correct: 2
+  },
+  {
+    question: "CP Art.379 El que condujere un vehículo a motor o un ciclomotor con temeridad manifiesta y pusiere en concreto peligro la vida o la integridad de las personas será castigado con las penas de:",
+    options: [
+      "Prisión de seis meses a dos años y privación del derecho a conducir vehículos a motor y ciclomotores por tiempo superior a uno y hasta seis años",
+      "Prisión de seis meses a tres años y privación del derecho a conducir vehículos a motor y ciclomotores por tiempo superior a uno y hasta seis años",
+      "Prisión de seis meses a dos años y privación del derecho a conducir vehículos a motor y ciclomotores por tiempo superior a uno y hasta tres años",
+      "Prisión de uno a tres años y privación del derecho a conducir vehículos a motor y ciclomotores por tiempo superior a uno y hasta seis años"
+    ],
+    correct: 0
+  },
+  {
+    question: "LP Art.308 El incumplimiento de las normas sobre Registro de Buques y Empresas Navieras, exportación, importación o abanderamiento provisional de buque español en favor de extranjeros o de buques extranjeros en España, se considera una infracción:",
+    options: [
+      "Muy grave",
+      "Leve",
+      "Moderada",
+      "Grave"
+    ],
+    correct: 0
+  },
+  {
+    question: "RGC Art.57 Si dos vehículos se aproximan a una intersección, ¿Quién tendrá preferencia, si uno viene por una vía pavimentada y el otro por una sin pavimentar?",
+    options: [
+      "El que venga por la derecha",
+      "El que venga por la vía pavimentada",
+      "El que venga por la vía sin pavimentar",
+      "El que venga por la izquierda"
+    ],
+    correct: 1
+  },
+  {
+    question: "CP Art.414 A la autoridad o funcionario público que, por razón de su cargo, tenga encomendada la custodia de documentos respecto de los que la autoridad competente haya restringido el acceso, y que a sabiendas destruya o inutilice los medios puestos para impedir ese acceso o consienta su destrucción o inutilización, incurrirá en la pena de:",
+    options: [
+      "Prisión de seis meses a un año o multa de seis a doce meses y, en cualquier caso, inhabilitación especial para empleo o cargo público por tiempo de uno a tres años",
+      "Prisión de seis meses a dos años o multa de doce a veinticuatro meses y, en cualquier caso, inhabilitación especial para empleo o cargo público por tiempo de uno a tres años",
+      "Prisión de seis meses a un año o multa de seis a veinticuatro meses y, en cualquier caso, inhabilitación especial para empleo o cargo público por tiempo de uno a tres años",
+      "Prisión de seis meses a un año o multa de seis a veinticuatro meses y, en cualquier caso, inhabilitación especial para empleo o cargo público por tiempo de uno a cinco años"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.33 ¿A quién corresponde la incoación y tramitación de los expedientes administrativos, cuando no esté atribuido expresamente a otro órgano?",
+    options: [
+      "Al Consejo de Administración",
+      "Al Director",
+      "Al Presidente",
+      "A Puertos del Estado"
+    ],
+    correct: 1
+  },
+  {
+    question: "RGC Art.65 Cuando se vaya a girar con un vehículo para entrar en otra vía y haya peatones cruzándola, aunque no exista paso para estos:",
+    options: [
+      "El peatón tendrá preferencia de paso",
+      "El vehículo tendrá preferencia de paso",
+      "Tendrá preferencia el que pase antes",
+      "Aunque tenga preferencia el vehículo, este parará por seguridad"
+    ],
+    correct: 0
+  },
+  {
+    question: "REP Art.27 Por norma general, después de finalizadas las operaciones de arranque y trincado, todo buque deberá dejar libre su atraque en un plazo inferior a:",
+    options: [
+      "Dos horas",
+      "Una hora",
+      "Tres horas",
+      "Dos horas y treinta minutos"
+    ],
+    correct: 0
+  },
+  {
+    question: "LP Art.31 A quién corresponde presentar al Consejo de Administración el Plan de Empresa, con los objetivos de gestión y criterios de actuación de la entidad, así como los proyectos de presupuestos, de programa de actuación, inversiones y financiación y de cuentas anuales:",
+    options: [
+      "Al Director",
+      "Al Presidente",
+      "Al Capitán Marítimo",
+      "Todas son correctas"
+    ],
+    correct: 1
+  },
+  {
+    question: "RGC Art.67 Podrán los vehículos de urgencia circular por encima de los límites de velocidad y estarán exentos de cumplir otras normas o señales:",
+    options: [
+      "No, en ningún caso",
+      "Sólo los públicos",
+      "Sí, tanto los públicos, como los privados",
+      "Sólo los privados"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.30 El Director:",
+    options: [
+      "Formará parte del Consejo de Administración, con voz y voto",
+      "No formará parte del Consejo de Administración",
+      "Formará parte del Consejo de Administración, con voz pero sin voto",
+      "Ninguna es correcta"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.29 El Consejo de Administración y el Presidente forman parte del órgano:",
+    options: [
+      "De gestión",
+      "De administración",
+      "De gobierno",
+      "Todas son correctas"
+    ],
+    correct: 2
+  },
+  {
+    question: "REP Art.29 Si un buque sufriera averías ocasionadas por algún elemento propiedad del Puerto Autónomo y su consignatario o Capitán estimaran que éste es responsable de la misma lo comunicarán a la Dirección del Puerto Autónomo antes de transcurridas:",
+    options: [
+      "Dos horas",
+      "Seis horas",
+      "Tres horas",
+      "Doce horas"
+    ],
+    correct: 2
+  },
+  {
+    question: "CP Art.17 La conspiración existe cuando:",
+    options: [
+      "Cuando una persona comete un delito contra una institución en la que trabaja",
+      "Dos o más personas cometen un delito",
+      "Cuando el que ha resuelto cometer un delito invita a otra u otras personas a participar en él",
+      "Dos o más personas se conciertan para la ejecución de un delito y resuelven ejecutarlo"
+    ],
+    correct: 3
+  },
+  {
+    question: "RGC Art.66 Las infracciones a las normas referentes a la prioridad de paso de los conductores sobre los animales son:",
+    options: [
+      "Leve",
+      "Muy graves",
+      "Graves",
+      "Faltas leves"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.27 ¿Quién recibe el importe producido de la aplicación del régimen sancionador?",
+    options: [
+      "Puertos del Estado",
+      "Ministerio de Fomento",
+      "Las Autoridades Portuarias",
+      "Todas son correctas"
+    ],
+    correct: 2
+  },
+  {
+    question: "REP Art.17 Los Armadores y Consignatarios de Buques censados en el Puerto Autónomo de Valencia, a quien comunicarán por escrito, salvo caso de fuerza mayor, la próxima entrada de cada buque en aguas de:",
+    options: [
+      "Capitanía Marítima",
+      "Comisaría de Explotación",
+      "Dirección del Puerto",
+      "Puertos del Estado"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.26 ¿Quién debe informar el proyecto de Reglamento de Explotación y Policía de los puertos, y elaborar y aprobar las correspondientes Ordenanzas Portuarias con los trámites y requisitos establecidos en el artículo 295, así como velar por su cumplimiento?",
+    options: [
+      "Puertos del Estado",
+      "El Consejo Rector",
+      "El Ministerio de Fomento",
+      "Las Autoridades Portuarias"
+    ],
+    correct: 3
+  },
+  {
+    question: "CP Art.30 En los delitos que se cometan utilizando medios o soportes de difusión mecánicos:",
+    options: [
+      "Responderán criminalmente los cómplices y quienes los hubieren favorecido personal o realmente",
+      "No responderán criminalmente ni los cómplices ni quienes los hubieren favorecido personal o realmente",
+      "Responderán criminalmente los cómplices pero no quienes los hubieren favorecido personal o realmente",
+      "No responderán criminalmente los cómplices pero sí quienes los hubieren favorecido personal o realmente"
+    ],
+    correct: 1
+  },
+  {
+    question: "LP Art.24 De quién dependen las autoridades portuarias:",
+    options: [
+      "Del Ministerio de Economía, a través del Ministerio de Fomento",
+      "Del Ministerio de Economía, a través de Puertos del Estado",
+      "Del Ministerio de Fomento, a través de Puertos del Estado",
+      "Ninguna es correcta"
+    ],
+    correct: 2
+  },
+  {
+    question: "REP Art.7 Dado el carácter de Agentes de la Autoridad uniformados, los policías Portuarios cuando se dirijan a cualquier persona o al ser requeridos por ella, deberán:",
+    options: [
+      "Dejar lo que estén haciendo y atender el requerimiento",
+      "Hablar de Usted a cualquier persona",
+      "Saludar llevándose la mano derecha extendida a la prenda que cubre la cabeza, rozándola con la punta de los dedos",
+      "Todas las anteriores son correctas"
+    ],
+    correct: 2
+  },
+  {
+    question: "RGC Art.63 Se entienden por tramos de gran pendiente los que tienen una inclinación mínima del:",
+    options: [
+      "Diez por ciento",
+      "Doce por ciento",
+      "Siete por ciento",
+      "Seis por ciento"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.21 A quién corresponde autorizar las inversiones y operaciones financieras de Puertos del Estado que resulten de su programa de actuación plurianual, incluidas la constitución y participación en sociedades mercantiles:",
+    options: [
+      "Ministerio de Fomento",
+      "Consejo Rector",
+      "Presidente de Puertos del Estado",
+      "Director de Puertos del Estado"
+    ],
+    correct: 1
+  },
+  {
+    question: "LP Art.21 En las Autoridades Portuarias, el porcentaje de aportación económica que reciba Puertos del Estado, en concepto de tasas será de:",
+    options: [
+      "2%",
+      "4%",
+      "5%",
+      "10%"
+    ],
+    correct: 1
+  },
+  {
+    question: "CP Art.18 La provocación existe cuando:",
+    options: [
+      "El que ha resuelto cometer un delito invita a otra u otras personas a participar en él",
+      "Directamente se incita por medio de la imprenta, la radiodifusión o cualquier otro medio de ecacia semejante, que facilite la publicidad, o ante una concurrencia de personas, a la perpetración de un delito",
+      "Se expone ante una concurrencia de personas o por cualquier medio de difusión, de ideas o doctrinas que ensalcen el crimen o enaltezcan a su autor. La apología solo será delictiva como forma de provocación y si por su naturaleza y circunstancias constituye una incitación directa a cometer un delito",
+      "Dos o más personas se conciertan para la ejecución de un delito y resuelven ejecutarlo"
+    ],
+    correct: 1
+  },
+  {
+    question: "REP Art.7 ¿Qué deberá hacer el personal de cualquier servicio de guardería privada establecido ocasional o permanentemente en el interior de los recintos portuarios?",
+    options: [
+      "Deberá contar con autorización administrativa previa de la Dirección del Puerto Autónomo para el ejercicio de sus funciones",
+      "Deberá velar por el cumplimiento del Reglamento",
+      "Deberá prestar al personal adscrito a la vigilancia, control y policía, la cooperación y auxilio que en casos excepcionales se le requiera",
+      "Todas las anteriores son correctas"
+    ],
+    correct: 3
+  },
+  {
+    question: "RGC Art.19 Únicamente se permitirá circular con láminas adhesivas o cortinillas contra el sol en las ventanillas posteriores cuando el vehículo lleve:",
+    options: [
+      "Espejo exterior derecho e interior central que cumplan las especicaciones técnicas necesarias",
+      "Espejo exterior izquierdo e interior central que cumplan las especicaciones técnicas necesarias",
+      "Dos espejos retrovisores exteriores que cumplan las especicaciones técnicas necesarias",
+      "Dos espejos retrovisores exteriores y uno interior que cumplan las especicaciones técnicas necesarias"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.19 ¿Cuál de estas afirmaciones es correcta?",
+    options: [
+      "Puertos del Estado elaborará anualmente un informe relativo a la ejecución de la política portuaria, que comprenderá el análisis de la gestión desarrollada en los puertos de interés general, y que remitirá al Ministerio de Fomento que lo elevará a las Cortes Generales",
+      "Cada autoridad portuaria elaborará anualmente un informe relativo a la ejecución de la política portuaria, que comprenderá el análisis de la gestión desarrollada en los puertos de interés general, y que remitirá al Ministerio de Fomento que lo elevará a las Cortes Generales",
+      "El Ministerio de Fomento elaborará anualmente un informe relativo a la ejecución de la política portuaria, que comprenderá el análisis de la gestión desarrollada en los puertos de interés general, y que remitirá al Ministerio de Economía que lo elevará a las Cortes Generales",
+      "Ninguna es correcta"
+    ],
+    correct: 0
+  },
+  {
+    question: "CP Art.31 El que actúe como administrador de hecho o de derecho de una persona jurídica, o en nombre o representación legal o voluntaria de otro:",
+    options: [
+      "Se le aplicará la pena en su mitad inferior",
+      "Estará exento de cualquier responsabilidad",
+      "Responderá personalmente",
+      "Responderá en nombre de aquel al que representa"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.17 ¿A quién corresponde la determinación de los muelles comerciales y la zona de actividad portuaria de acceso restringido?",
+    options: [
+      "Comisario de Explotación",
+      "Director del Puerto",
+      "Consejo de Administración",
+      "Consejo Rector de Puertos del Estado"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.17 ¿Quién determinará la estructura y el funcionamiento de la Comisión de Faros?",
+    options: [
+      "Puertos del Estado",
+      "Comisión de Ayuda a la Navegación",
+      "Ministerio de Fomento",
+      "Autoridades portuarias"
+    ],
+    correct: 2
+  },
+  {
+    question: "RGC Art.15 Las cargas que sobresalgan lateralmente del gálibo del vehículo, de tal manera que su extremidad posterior, durante más de 0,40 metros del borde exterior de la luz delantera o trasera de posición más cercana a ellas, deberán durante las horas de puesta y la salida del sol, respectivamente, señalizadas, en cada una de sus extremidades laterales:",
+    options: [
+      "Hacia adelante, por medio de una luz blanca y un dispositivo reflectante de color blanco, y hacia atrás, por medio de una luz roja y de un dispositivo reflectante de color rojo",
+      "Hacia adelante, por medio de una luz amarilla y un dispositivo reflectante de color amarillo, y hacia atrás, por medio de una luz roja y de un dispositivo reflectante de color rojo",
+      "Hacia adelante, por medio de una luz blanca y un dispositivo reflectante de color blanco, y hacia atrás, por medio de una luz amarilla y de un dispositivo reflectante de color amarillo",
+      "Hacia adelante, por medio de una luz blanca y un dispositivo reflectante de color blanco, y hacia atrás, por medio de un trapo de color rojo y de un dispositivo reflectante de color rojo"
+    ],
+    correct: 0
+  },
+  {
+    question: "LP Art.13 En los términos establecidos en esta ley, a quien corresponde la gestión de los puertos de su competencia en régimen de autonomía:",
+    options: [
+      "Ministerio de Fomento",
+      "Puertos del Estado",
+      "Autoridad Portuaria",
+      "Comunidad Autónoma"
+    ],
+    correct: 2
+  },
+  {
+    question: "REP Art.7 Según el organigrama básico del personal adscrito a vigilancia, control y policía, ¿Quién de los siguientes ocupa la posición de mayor relevancia?",
+    options: [
+      "Jefe de Explotación",
+      "Comisario de Explotación",
+      "Jefe de Seguridad Operativa",
+      "Contramaestre de la Policía Portuaria"
+    ],
+    correct: 0
+  },
+  {
+    question: "CP Art.19 No se será responsable criminalmente con arreglo al Código Penal, hasta la edad de:",
+    options: [
+      "Dieciséis años",
+      "Catorce años",
+      "Dieciocho años",
+      "Se será responsable a cualquier edad"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.9 La Ley que nos ocupa será de aplicación:",
+    options: [
+      "Exclusivamente a la flota civil española, así como a las plataformas fijas situadas en aguas en las que España ejerce soberanía, derechos soberanos o jurisdicción",
+      "Exclusivamente a la flota civil española, así como a las plataformas fijas situadas en aguas en las que España ejerce soberanía, derechos soberanos o jurisdicción. Así a los buques civiles extranjeros que se encuentren en aguas situadas en zonas en las que España ejerce soberanía, derechos soberanos o jurisdicción",
+      "Exclusivamente a la flota civil española, así como a las plataformas fijas situadas en aguas en las que España ejerce soberanía, derechos soberanos o jurisdicción. Así como a los buques civiles y militares extranjeros que se encuentren en aguas situadas en zonas en las que España ejerce soberanía, derechos soberanos o jurisdicción",
+      "Exclusivamente a la flota civil española"
+    ],
+    correct: 1
+  },
+  {
+    question: "RGC Art.18 Conducir y utilizar cascos o auriculares conectados a aparatos receptores o reproductores de sonido, por norma general:",
+    options: [
+      "Está prohibido por vías interurbanas",
+      "Está permitido",
+      "Está prohibido",
+      "Está prohibido por vías urbanas"
+    ],
+    correct: 2
+  },
+  {
+    question: "REP Art.11 A quién corresponde autorizar a los pasajeros, tripulantes y demás personas el acceso a bordo de los buques atracados o fondeados en los puertos:",
+    options: [
+      "Director del Puerto",
+      "A la Autoridad de Marina competente",
+      "Consejo de Administración",
+      "Ninguna es correcta"
+    ],
+    correct: 1
+  },
+  {
+    question: "LP Art.8 La navegación, en función de sus condiciones de prestación, puede clasificarse en:",
+    options: [
+      "Regular, no regular y circunstancial",
+      "Regular y no regular",
+      "Regular, no regular y de frecuencia",
+      "Ninguna es correcta"
+    ],
+    correct: 1
+  },
+  {
+    question: "CP Art.16 Hay tentativa cuando:",
+    options: [
+      "El sujeto da fin a la ejecución del delito directamente por hechos exteriores, practicando todos o parte de los actos que objetivamente deberían producir el resultado, y sin embargo éste no se produce por causas independientes de la voluntad del autor",
+      "El sujeto idea la ejecución pero no inicia la acción del delito",
+      "El sujeto da principio a la ejecución del delito directamente por hechos exteriores, practicando todos o parte de los actos que objetivamente deberían producir el resultado, y sin embargo éste no se produce por causas independientes de la voluntad del autor",
+      "El sujeto da fin a la ejecución del delito directamente por hechos exteriores, practicando todos los actos que objetivamente deberían producir el resultado, y sin embargo éste no se produce por causas independientes de la voluntad del autor"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.8 Es zona contigua:",
+    options: [
+      "Aquélla que se extiende hasta una distancia de doce millas náuticas contadas a partir de las líneas de base desde las que se mide su anchura",
+      "La que se extiende desde el límite exterior del mar territorial hasta una distancia de doscientas millas náuticas contadas a partir de las líneas de base desde las que se mide la anchura de aquél",
+      "Las aguas situadas en el interior de las líneas de base del mar territorial",
+      "La que se extiende desde el límite exterior del mar territorial hasta las veinticuatro millas náuticas contadas desde las líneas de base a partir de las cuales se mide la anchura del mar territorial"
+    ],
+    correct: 3
+  },
+  {
+    question: "RGC Art.60 En los tramos de la vía en los que por su estrechez sea imposible o muy difícil el paso simultáneo de dos vehículos que circulen en sentido contrario, donde no haya señalización expresa al efecto, tendrá derecho de preferencia de paso el que hubiese entrado primero. En caso de duda sobre dicha circunstancia, tendrá la preferencia:",
+    options: [
+      "El vehículo con menores dicultades de maniobra",
+      "El vehículo con mayores dicultades de maniobra",
+      "Las motocicletas",
+      "Los tractocamiones"
+    ],
+    correct: 1
+  },
+  {
+    question: "REP Art.7 La jefatura inmediata y directa de la vigilancia, control y policía, dentro del ámbito de las atribuciones que le confiere la legislación vigente, será ejercida por:",
+    options: [
+      "Contramaestre de la Policía Portuaria",
+      "Director del Puerto",
+      "Presidente del Puerto",
+      "Jefe de Explotación"
+    ],
+    correct: 1
+  },
+  {
+    question: "CP Art.28 Aquellas personas que inducen directamente a otro u otros a ejecutar un delito:",
+    options: [
+      "Se consideran autores, pero será una causa atenuante no haber participado",
+      "Se consideran cómplices",
+      "Se consideran autores",
+      "Se consideran cómplices, pero será una causa agravante la inducción"
+    ],
+    correct: 2
+  },
+  {
+    question: "Es la flota de barcos usados para el comercio y el turismo:",
+    options: [
+      "Marina total",
+      "Marina comercial",
+      "Marina Mercante",
+      "Todas son correctas"
+    ],
+    correct: 2
+  },
+  {
+    question: "CP Art.22 Hay reincidencia cuando:",
+    options: [
+      "Al delinquir, el culpable haya sido acusado ejecutoriamente por un delito comprendido en el mismo título de este Código, siempre que sea de la misma naturaleza",
+      "Al delinquir, el culpable haya sido condenado ejecutoriamente por un delito comprendido en el mismo título de este Código, siempre que sea de la misma naturaleza",
+      "Al delinquir, el culpable haya sido condenado dos o más veces ejecutoriamente por un delito comprendido en el mismo título de este Código, siempre que sea de la misma naturaleza",
+      "Al delinquir, el culpable haya sido condenado ejecutoriamente por un delito comprendido en el Código Penal"
+    ],
+    correct: 1
+  },
+  {
+    question: "LP Art.5 En puertos de competencia de las Comunidades Autónomas, quién debe hacerse cargo de los vertidos en las aguas interiores, y en las territoriales:",
+    options: [
+      "Las Comunidades Autónomas",
+      "El Ministerio de Fomento",
+      "La Empresa designada por el Gobierno a tales efectos",
+      "Las Comunidades Autónomas, cuando así lo hayan asumido en sus respectivos Estatutos de Autonomía"
+    ],
+    correct: 3
+  },
+  {
+    question: "LP Art.3 ¿Cuál de estos organismos no participa en el proceso de autorización en los puertos estatales de la realización de operaciones comerciales?",
+    options: [
+      "Ministerio de Economía",
+      "Ministerio de Interior",
+      "Ministerio de Obras Públicas y Transporte (Fomento)",
+      "Ministerio de Agricultura"
+    ],
+    correct: 1
+  },
+  {
+    question: "REP Art.6 A quién corresponde prevenir, evitar y denunciar las infracciones del Código de la Circulación que se cometan en los viales de los recintos portuarios:",
+    options: [
+      "Policía Portuaria, Guardia Civil y Policía Local",
+      "Policía Portuaria exclusivamente",
+      "Policía Portuaria y Guardia Civil",
+      "Policía Portuaria y Policía Local"
+    ],
+    correct: 1
+  },
+  {
+    question: "RGC Art.56 Incumplir las normas que regulan la prioridad de paso, se considera:",
+    options: [
+      "Infracción muy grave",
+      "Infracción grave",
+      "Infracción leve",
+      "Falta grave"
+    ],
+    correct: 1
+  },
+  {
+    question: "LP Art.3 ¿Cuál de las siguientes actividades no se considera actividad comercial portuaria?",
+    options: [
+      "Reparación de buques",
+      "Avituallamiento",
+      "Tráco de pasajeros",
+      "Descarga y manipulación de la pesca fresca"
+    ],
+    correct: 3
+  },
+  {
+    question: "CP Art.22 Ejecutar el hecho delictivo mediante disfraz, facilitando la impunidad del delincuente:",
+    options: [
+      "Fija la pena en la mitad superior",
+      "Es una causa agravante",
+      "Es una causa atenuante",
+      "Se aplicará la pena inferior en dos o tres grados"
+    ],
+    correct: 1
+  },
+  {
+    question: "RGC Art.15 Cuando el vehículo circule entre la puesta y la salida del sol o bajo condiciones meteorológicas o ambientales que disminuyan sensiblemente la visibilidad, la carga que sobresale por la parte trasera deberá ir señalizada, además, con:",
+    options: [
+      "Una luz roja",
+      "Una luz blanca",
+      "Un trapo rojo",
+      "Una luz amarilla"
+    ],
+    correct: 0
+  },
+  {
+    question: "LP Art.2 Cómo se denomina al conjunto de espacios terrestres, aguas marítimas e instalaciones que, situado en la ribera de la mar o de los ríos, reúna condiciones físicas, naturales o artificiales y de organización que permitan la realización de operaciones de tráfico portuario, y sea autorizado para el desarrollo de estas actividades por la Administración competente:",
+    options: [
+      "Puerto marítimo",
+      "Puerto hub",
+      "Puerto seco",
+      "Todas las anteriores son correctas"
+    ],
+    correct: 0
+  },
+  {
+    question: "CP Art.21 La dilación extraordinaria e indebida en la tramitación del procedimiento, siempre que no sea atribuible al propio inculpado y que no guarde proporción con la complejidad de la causa:",
+    options: [
+      "Fija la pena en la mitad superior",
+      "Es una causa atenuante",
+      "Excluye la responsabilidad criminal",
+      "Delimita la pena a la mitad"
+    ],
+    correct: 1
+  },
+  {
+    question: "RD 145/89 Art.14 Respecto de la admisión de MMPP en los puertos, el RD 145/89 establece:",
+    options: [
+      "Cuando se trate de la clase 7 (radioactivos), la información incluirá: Clase, división, grupo de compatibilidad y contenido neto de materia radiactiva",
+      "Si la mercancía llega por vía terrestre o vía marítima, en ambos casos deberá aportar con la solicitud la Declaración o nota de mercancías peligrosas",
+      "Si carga/descarga a granel de hidrocarburos, gases licuados y productos químicos, si el buque dispone de los certicados de arrumazón que acrediten cumplir los requisitos que jan los Códigos de la OMI",
+      "Que el cargador o consignatario solicitará al Director del puerto la admisión en documento en el que se indican con 24 horas de antelación de la llegada a puerto de las mismas"
+    ],
+    correct: 1
+  },
+  {
+    question: "RD 145/89 Art.15 ¿Cuál de estas MMPP necesitará autorización especial escrita para la admisión al puerto?",
+    options: [
+      "Cianógeno y cloro",
+      "Desechos químicos con intención de verterlos o quemarlos en el mar y Nitrato amónico con concentración al 23% de nitrógeno",
+      "Explosivos, divisiones 1.1, 1.2, 1.3 y 1.4",
+      "Materiales radiactivos (clase 7) y sustancias oxidantes (clase 5.1)"
+    ],
+    correct: 0
+  },
+  {
+    question: "RD 145/89 Art.16 Admisión de contenedores:",
+    options: [
+      "A la solicitud de admisión deberá adjuntarse, además, el certicado de arrumazón",
+      "A la solicitud de admisión deberá adjuntarse, además, el certicado de cumplimiento",
+      "Si el contenedor ha sido construido después del 1 de enero de 1994 deberá ir provisto de la placa de aprobación relativa a seguridad CSC",
+      "Todo contenedor deberá acreditar el peso neto máximo para el que está autorizado"
+    ],
+    correct: 0
+  },
+  {
+    question: "RD 145/89 Art.4 ¿A quién compete la admisión y limitaciones de MMPP en los puertos?",
+    options: [
+      "Al Capitán Marítimo la admisión de los buques que transportan MMPP",
+      "Al Director del Puerto la admisión de mercancías peligrosas en la zona de servicio del puerto",
+      "El organismo portuario correspondiente determinará las categorías y cantidades de MMPP que podrán admitirse en la zona de servicio del puerto por vía terrestre o procedentes de los buques",
+      "Todas las respuestas son correctas"
+    ],
+    correct: 3
+  },
+  {
+    question: "RD 145/89 Art.12 Según el RD 145/89:",
+    options: [
+      "El embarque y desembarque de las mercancías peligrosas estará bajo el control del Director del Puerto",
+      "El funcionamiento del centro de control de emergencias se garantizará como mínimo veinte sobre veinticuatro horas y deberá disponer de el plan de emergencia interior del puerto disponible para el jefe de emergencia exterior respectivo",
+      "En todos los puertos nacionales se dispondrá de un centro de control de emergencias desde el que se coordinarán todas las operaciones que constituyen las diversas fases de las actuaciones del plan de emergencia interior de las emergencias que puedan originarse",
+      "Todas las respuestas son correctas"
+    ],
+    correct: 2
+  },
+  {
+    question: "RD 145/89 Art.3.9 El flash-point o punto de inflamación es:",
+    options: [
+      "La temperatura que en determinadas condiciones de transporte o almacenamiento pueden presentar riesgos a causa de reacciones espontáneas tales como polimeración",
+      "Es la temperatura mínima a la cual un líquido desprende vapores en suciente cantidad para formar una mezcla inamable con el aire mediante una fuente de calor de ignición interior",
+      "Es la temperatura a partir de la cual la susstancia combustible arde espontáneamente (a la presión normal), sin necesidad de la presencia de ninguna chispa ni llama",
+      "Todas las anteriores son incorrectas"
+    ],
+    correct: 3
+  },
+  {
+    question: "RD 145/89 Art.3.11 Según el RD 145/89, no tienen la consideración de cisterna o tanque portátil:",
+    options: [
+      "Los tanques/cisternas con capacidad igual o menor de 450 litros",
+      "Los vagones cisterna de ferrocarril con capacidad no superior a 450 l",
+      "Las tanques/cisternas para sustancias de la clase III",
+      "Todas las anteriores son incorrectas"
+    ],
+    correct: 0
+  },
+  {
+    question: "RD 145/89 Art.3.36 ¿Cuál de las siguientes afirmaciones es la correcta?",
+    options: [
+      "El TPC es una disposición análoga al ADR, que regula el transporte de mercancías peligrosas por ferrocarril",
+      "El TPF es una disposición análoga al ADR, que regula el transporte de mercancías peligrosas por carretera",
+      "El RID es el Acuerdo Europeo sobre el transporte internacional de mercancías peligrosas por carretera",
+      "Todas son incorrectas"
+    ],
+    correct: 3
+  },
+  {
+    question: "Las normas del RD 145/89 serán de aplicación:",
+    options: [
+      "En las zonas portuarias cuando en las mismas se realicen operaciones con mercancías clasicadas como peligrosas",
+      "A las sustancias peligrosas que constituyan provisiones, equipos y pertrechos, así como combustibles para el uso del buque y de los equipos móviles a él incorporados",
+      "A las dependencias de la Armada en arsenales y puertos militares",
+      "Todas las respuestas anteriores son correctas"
+    ],
+    correct: 0
+  },
+  {
+    question: "RD 145/89 Art.3.8 ¿Qué es el Certificado de Aptitud?",
+    options: [
+      "Documento conteniendo la declaración del expedidor que dene el número, nombre, propiedades y riesgos que entraña la mercancía, los medios de prevención y los de actuación en caso de emergencia",
+      "Documento exigido por el Código IMDG para el transporte marítimo de mercancías peligrosas cuando constituyen cantidades limitadas",
+      "Documento que emite el expedidor o cargador de un contenedor o vehículo con mercancías peligrosas, acreditando que las mismas fueron arrumadas cuando el contenedor se encontraba vacío",
+      "El emitido por el Organismo de la Administración acreditando que el buque cumple los requisitos que exigen los Códigos sobre la construcción de equipos, capacitándolo para el transporte de determinadas mercancías peligrosas"
+    ],
+    correct: 3
+  },
+  {
+    question: "R(CE) 725/2004 El Certificado Internacional de protección de buques:",
+    options: [
+      "Se expedirá después de que se haya llevado a cabo una vericación inicial o de renovación de conformidad",
+      "Será expedido o refrendado por la Compañía del buque",
+      "Si el idioma utilizado es el ingles, el texto solo incluirá una traducción a este idioma",
+      "El certicado internacional de protección del buque se expedirá para el periodo que especique la compañía, que no excederá de tres años"
+    ],
+    correct: 0
+  },
+  {
+    question: "R1617 Art.6.5 Corresponderá a la Dirección General de la Marina Mercante las funciones siguientes:",
+    options: [
+      "La fijación de criterios para el establecimiento de acuerdos entre puertos españoles y los de otros Gobiernos contratantes del Convenio SOLAS en su versión enmendada, en materia de protección portuaria",
+      "Emitir informe sobre la evaluación y el plan de protección del puerto y sus modicaciones, con carácter previo a su aprobación",
+      "Establecer los contenidos mínimos de los planes de protección de los buques",
+      "Autorizar a los OPRs para actuar en nombre de la Administración en lo que afecta a la protección de los buques y en relación con las compañías"
+    ],
+    correct: 3
+  },
+  {
+    question: "R1617 Art.7 ¿Cuál de las siguientes funciones de la Autoridad de Protección Portuaria es la correcta?",
+    options: [
+      "La aprobación del plan de protección del puerto y su modicación",
+      "La elaboración del plan de protección del puerto en base a la correspondiente evaluación de la protección marítima",
+      "Vericar la formación de los ociales de protección de los buques y los ociales de la compañía ante la protección",
+      "La movilización de las Fuerzas y Cuerpos de Seguridad del Estado en caso de recibir una alerta de protección"
+    ],
+    correct: 1
+  },
+  {
+    question: "R1617 Art.8 Los Comités Consultivos de protección del puerto:",
+    options: [
+      "Serán constituidos por Puertos del Estado en cada puerto de interés general",
+      "Estarán compuestos por el Oficial de Protección del Puerto y por todos los Ociales de Protección de las instalaciones portuarias ubicadas en el Puerto correspondiente",
+      "Los miembros del Comité consultivo serán nombrados por el Presidente de la Autoridad Portuaria, a propuesta de la autoridad responsable del órgano o institución a la que representan",
+      "Ninguna de las anteriores respuestas es correcta"
+    ],
+    correct: 2
+  },
+  {
+    question: "R1617 Art.10 Las evaluaciones de protección de los puertos reflejarán y considerarán:",
+    options: [
+      "Las particularidades de las distintas partes del puerto",
+      "Las amenazas y posibles ataques que tengan una incidencia en la protección del puerto",
+      "Las evaluaciones de protección de las instalaciones portuarias que se encuentren dentro de los límites del puerto",
+      "Todas las respuestas anteriores son correctas"
+    ],
+    correct: 3
+  },
+  {
+    question: "R1617 Art.10.7 La evaluación de la protección del puerto deberá ser revisada siempre que:",
+    options: [
+      "Se hayan producido sucesos que afecten a la protección del puerto cuyos riesgos no hayan sido previamente evaluados",
+      "Al menos tres años desde la fecha de su aprobación",
+      "La Comisión Europea lo determine en función de la importancia de las amenazas de sucesos que afecten a la seguridad de otros puertos miembros de la UE",
+      "Ninguna de las anteriores respuestas es correcta"
+    ],
+    correct: 3
+  },
+  {
+    question: "R1617 Art.11 Respecto al Plan de Protección Portuaria, el RD 1617/2007, establece:",
+    options: [
+      "La Autoridad de Protección Portuaria elaborará un plan de protección del puerto para cada puerto que gestione",
+      "El plan de protección del puerto no abordará las peculiaridades de las distintas partes del puerto, pero integrará los planes de protección de las instalaciones portuarias que se encuentren dentro de sus límites",
+      "Una OPR no podrá elaborar el Plan de Protección Portuaria, si él de una Instalación Portuaria o de un buque",
+      "El Ministerio de Fomento, previo informe favorable de la Dirección General de la Marina Mercante, aprobará el Plan de Protección Portuaria"
+    ],
+    correct: 0
+  },
+  {
+    question: "R1617 Art.11.9 Las modificaciones producidas como consecuencia de una revisión del plan de protección del puerto deberán ser aprobadas:",
+    options: [
+      "Siempre que afecten a los requisitos de acceso a zonas adyacentes",
+      "Siempre que afecten a los requisitos de formación y de realización de ejercicios y simulacros",
+      "Las modicaciones deberán ser aprobadas por la propia Autoridad de Protección Portuaria",
+      "Todas las respuestas anteriores son correctas"
+    ],
+    correct: 1
+  },
+  {
+    question: "r1617 Art.11.11 ¿Cuál de estas siguientes afirmaciones es la correcta?",
+    options: [
+      "Corresponde al Ministerio del Interior habilitar el acceso al plan de protección portuaria a aquellos organismos que requieran el acceso a la información contenida en el mismo",
+      "Corresponde al Ministerio de Fomento, a través de Puertos del Estado, habilitar el acceso al plan de protección portuaria a aquellos organismos que requieran el acceso a la información contenida en el mismo",
+      "Corresponde a la Autoridad Nacional de Protección Portuaria habilitar el acceso al plan de protección portuaria a aquellos organismos que requieran el acceso a la información contenida en el mismo",
+      "Corresponde a la propia Autoridad de Protección Portuaria habilitar el acceso al plan de protección portuaria a aquellos organismos que requieran el acceso a la información contenida en el mismo"
+    ],
+    correct: 2
+  },
+  {
+    question: "R1617 Art.17 En los puertos que hayan sufrido un incidente de protección, se elaborará un informe que recoja los hechos ocurridos y el procedimiento seguido desde su inicio hasta su finalización ¿Quién lo realizará?",
+    options: [
+      "El Oficial de Protección del Puerto y será remitido a la Comisión Europea para su registro",
+      "El Oficial de Protección del Puerto y será remitido al oficial de protección del buque que haya resultado afectado para incluir dicho incidente y a la autoridad de protección portuaria",
+      "Los Oficiales de Protección de las Instalaciones Portuarias afectadas a través del Comité Consultivo de Protección Portuaria",
+      "Ninguna de las anteriores respuestas es correcta"
+    ],
+    correct: 1
+  },
+  {
+    question: "R1617 Art.7 ¿Quién designa al Oficial de Protección Portuaria?",
+    options: [
+      "La Autoridad de Protección Portuaria",
+      "El Ministerio del Interior",
+      "La Secretaría General de Transportes del Ministerio de Fomento",
+      "Puertos del Estado"
+    ],
+    correct: 0
+  },
+  {
+    question: "r1617 Art.12 La declaración de cumplimiento de los puertos:",
+    options: [
+      "Perderá su validez al producirse un incumplimiento grave o al vericarse que el puerto ha dejado de estar sujeto a lo prescrito por el RD 1617/2007",
+      "La declaración de cumplimiento tendrá vigencia de cinco años desde la fecha de su emisión y será renovada por periodos sucesivos de tres años",
+      "Los puertos sujetos a las prescripciones de RD 1617/2007 podrán disponer de una declaración de cumplimiento otorgada por el organismo competente solicitada por Puertos del Estado",
+      "Los puertos sujetos a las prescripciones de RD 1617/2007 podrán disponer de una declaración de cumplimiento otorgada por el organismo competente solicitada por la Autoridad de Protección Portuaria"
+    ],
+    correct: 0
+  },
+  {
+    question: "R1617 Art.14 Los niveles de protección marítima:",
+    options: [
+      "En el nivel de protección 1 se deben mantener medidas mínimas de protección en todo momento",
+      "No se admitirá en el puerto ningún buque que tenga asignada por su Administración responsable de la certicación inferior al nivel de protección en el que está operando el puerto",
+      "Corresponde al Ministerio del Interior determinar los niveles de protección en los que deben operar los puertos",
+      "Todas las respuestas son correctas"
+    ],
+    correct: 3
+  },
+  {
+    question: "R1617 Art.19 Sobre el suministro de información sobre la protección antes de la entrada de un buque a un puerto, el RD 1617/2007 establece:",
+    options: [
+      "Deberá comunicar la conrmación de la existencia de un certicado válido del buque, indicando el nombre del organismo autorizado que lo ha expedido y remitido a la autoridad de protección portuaria y a la capitanía marítima",
+      "Deberá comunicar el nivel de protección al que opera el buque en ese momento remitiéndolo, con la debida antelación, al Oficial de Protección de Puerto y al Oficial de Protección de la IP donde el buque va a atracar",
+      "Deberá comunicar el nivel de protección al que haya operado el buque en cualquier puerto anterior donde haya realizado una operación de interfaz buque-puerto, comprendiendo las relativas a las últimas cinco IPs visitadas por el buque",
+      "Deberá comunicar las medidas especiales o adicionales de protección que haya tomado el buque en cualquier puerto anterior donde haya realizado una operación de interfaz buque-puerto, comprendiendo las relativas a las últimas cinco IPs visitadas por el buque"
+    ],
+    correct: 1
+  },
+  {
+    question: "R1617 Art.19.2 El suministro de información sobre la protección antes de la entrada de un buque a un puerto será facilitada:",
+    options: [
+      "Con al menos 24 horas de antelación a la entrada del buque en el puerto",
+      "A más tardar en el momento en que el buque salga del puerto anterior, si la duración del viaje es inferior a 24 horas",
+      "Si no se conoce el puerto de escala, desde el momento en que ese puerto de escala es conocido",
+      "Todas las respuestas son correctas"
+    ],
+    correct: 3
+  },
+  {
+    question: "R1617 Art.20 ¿Cuál de estas afirmaciones no es correcta?",
+    options: [
+      "El control de acceso a los puertos se efectuará según lo dispuesto en el correspondiente plan de protección del puerto",
+      "Los sistemas de control de accesos podrán impedir o restringir la actuación de las personas componentes de los Cuerpos o Fuerzas de seguridad del Estado",
+      "Se establecerá un sistema de inspecciones que garantice la supervisión periódica de la implantación de los planes de protección de los puertos",
+      "Mediante una orden conjunta de los Ministros de Fomento y del Interior, se regularán los aspectos del sistema de inspecciones, entre ellos los requisitos mínimos de capacidad, funciones y responsabilidades de los inspectores"
+    ],
+    correct: 1
+  },
+  {
+    question: "R1617 Dis. Adi. 1º Puertos del Estado tiene las siguientes funciones sobre protección portuaria:",
+    options: [
+      "Emitir informe sobre la evaluación y el plan de protección del puerto y sus modicaciones, con carácter previo a su aprobación",
+      "La designación de los oficiales de protección de las instalaciones portuarias",
+      "El otorgamiento de la declaración de cumplimiento del puerto",
+      "La identicación de los límites de los puertos y de las IPs a los que sea de aplicación el RD 1617/2007 en base a los resultados de las evaluaciones de protección que se hayan realizado"
+    ],
+    correct: 2
+  },
+  {
+    question: "Sobre la evaluación de la protección portuaria, el Anexo I del RD 1617/2007, establece:",
+    options: [
+      "Es el fundamento de la elaboración del plan de protección portuaria y de su posterior ejecución",
+      "Se deberá atender a la relación con otros planes de protección, como los de las IPs y otras medidas de protección existentes pero no deberá mezclar con otras planes de respuesta, como el plan de respuesta a vertidos petroleros o el de intervención médica",
+      "Se realizará una identicación de todas las zonas del puerto pertinentes para la protección, incluyendo la jación de los límites de estas zonas por parte de Puertos del Estado",
+      "Todas las respuestas anteriores son correctas"
+    ],
+    correct: 0
+  },
+  {
+    question: "Sobre el plan de protección portuaria, el Anexo II del RD 1617/2007, establece:",
+    options: [
+      "Los medios, procedimientos y actuaciones nunca podrán diferir en las distintas subzonas de un puerto",
+      "En algunas zonas los requisitos de acceso sólo entrarán en vigor cuando los niveles de protección superen un determinado umbral",
+      "Servirá para efectuar la evaluación de la protección portuaria",
+      "Las prescripciones sobre documentos de identicación, control de equipajes y carga se aplicarán siempre a las subzonas y no se podrán aplicar parcialmente a las distintas subzonas"
+    ],
+    correct: 1
+  },
+  {
+    question: "R1617 Anexo III Las condiciones que debe reunir una organización de protección reconocida para puertos e instalaciones portuarias son:",
+    options: [
+      "Conocimiento de la legislación nacional e internacional pertinente",
+      "Capacidad para el reconocimiento y la detección de armas y sustancias o dispositivos peligrosos",
+      "a) y b) son correctas",
+      "a) y b) son incorrectas"
+    ],
+    correct: 2
+  },
+  {
+    question: "R1617 Art.5 y 7 ¿Qué afirmación es la correcta?",
+    options: [
+      "El Ministerio de Fomento y Puertos del Estado aprueban las Evaluaciones de Protección de los Puertos",
+      "El Ministerio del Interior elabora tanto las Evaluaciones de Protección de los Puertos como los Planes de Protección del Puerto",
+      "a) y b) son correctas",
+      "a) y b) son incorrectas"
+    ],
+    correct: 3
+  },
+  {
+    question: "LP Art.122 Los titulares de licencias de servicios portuarios deberán presentar sus cuentas anuales y el correspondiente informe de auditoría a:",
+    options: [
+      "Puertos del Estado",
+      "Comunidad Autónoma",
+      "Autoridad Portuaria",
+      "Ministerio de Fomento"
+    ],
+    correct: 2
+  },
+  {
+    question: "CP Art.428 El funcionario público o autoridad que influyere en otro funcionario público o autoridad prevaliéndose del ejercicio de las facultades de su cargo para conseguir una resolución que le pueda generar directa o indirectamente un beneficio económico para sí o para un tercero, incurrirá en las penas de:",
+    options: [
+      "prisión de nueve meses a dos años, multa del tanto al duplo del benecio perseguido u obtenido e inhabilitación especial para empleo o cargo público y para el ejercicio del derecho de sufragio pasivo por tiempo de cinco a nueve años",
+      "prisión de uno a dos años, multa del tanto al duplo del benecio perseguido u obtenido e inhabilitación especial para empleo o cargo público y para el ejercicio del derecho de sufragio pasivo por tiempo de cinco a nueve años",
+      "prisión de seis meses a dos años, multa del tanto al duplo del benecio perseguido u obtenido e inhabilitación especial para empleo o cargo público y para el ejercicio del derecho de sufragio pasivo por tiempo de cinco a nueve años",
+      "prisión de dos a cuatro años, multa del tanto al duplo del benecio perseguido u obtenido e inhabilitación especial para empleo o cargo público y para el ejercicio del derecho de sufragio pasivo por tiempo de cinco a nueve años"
+    ],
+    correct: 2
+  },
+  {
+    question: "RGC Art.83.2 En qué situación ningún conductor deberá cambiar de carril para adelantar ni para efectuar cualquier otra maniobra, excepto si va a prepararse a girar a la derecha o a la izquierda, salir de la calzada o tomar un desvío:",
+    options: [
+      "Cuando la densidad de la circulación sea tal que los vehículos ocupen toda la anchura de la calzada, circulando en la a una velocidad que dependa de la velocidad del que le precede en su carril",
+      "Al circular por autovías",
+      "Al circular por vías urbanas",
+      "Al circular por vías interurbanas"
+    ],
+    correct: 0
+  },
+  {
+    question: "LP Ar.126.3 El número de prestadores del servicio de practicaje quedará limitado en cada área portuaria.",
+    options: [
+      "Un único prestador",
+      "No más de dos prestadores",
+      "No más de tres prestadores",
+      "Ninguna es correcta"
+    ],
+    correct: 0
+  },
+  {
+    question: "CP Art.21 Haber establecido, antes del comienzo del juicio oral, medidas eficaces para prevenir y descubrir los delitos que en el futuro pudieran cometerse con los medios o bajo la cobertura de la persona jurídica.",
+    options: [
+      "Hará reducir la pena a la mitad",
+      "Será causa para estar exento de responsabilidad criminal",
+      "Será una causa atenuante",
+      "Hará reducir la pena dos o tres grados"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.125.2 Con el fin de supervisar y fomentar las condiciones de competencia efectiva en la prestación de servicios portuarios, quien aprobará las tarifas máximas en los servicios portuarios, excepto en las terminales marítimas de pasajeros y mercancías dedicadas a uso particular, cuando el número de prestadores del servicio esté limitado o sea insuficiente para garantizar la competencia.",
+    options: [
+      "Autoridades Portuarias",
+      "Puertos del Estado",
+      "Ministerio de Economía",
+      "Ministerio de Fomento"
+    ],
+    correct: 0
+  },
+  {
+    question: "Según el Reglamento de Servicio y Policía, la reventa dentro de las zonas portuarias de los productos de la pesca adquiridos en subasta, así como su venta al detalle se considera una infracción:",
+    options: [
+      "Leve",
+      "Grave",
+      "Muy grave",
+      "Moderada"
+    ],
+    correct: 0
+  },
+  {
+    question: "LP Art.120.2 Dónde se creará el Registro General de empresas prestadoras de servicios portuarios:",
+    options: [
+      "Ministerio de Fomento",
+      "Autoridad Portuaria",
+      "Puertos del Estado",
+      "Comunidades Autónomas"
+    ],
+    correct: 2
+  },
+  {
+    question: "CP Art.419 La autoridad o funcionario público que, en provecho propio o de un tercero, recibiere o solicitare, por sí o por persona interpuesta, dádiva, favor o retribución de cualquier clase o aceptare ofrecimiento o promesa para realizar en ejercicio de su cargo un acto contrario a los deberes inherentes al mismo, o para no realizar o retrasar injustificadamente lo que debería practicar, incurrirá en las penas de:",
+    options: [
+      "Prisión de cuatro a seis años, multa de doce a veinticuatro meses, e inhabilitación especial para empleo o cargo público y para el ejercicio del derecho de sufragio pasivo por tiempo de seis a doce años",
+      "Prisión de tres a nueve años, multa de doce a veinticuatro meses, e inhabilitación especial para empleo o cargo público y para el ejercicio del derecho de sufragio pasivo por tiempo de seis a diez años",
+      "Prisión de tres a diez años, multa de diez a veinte meses, e inhabilitación especial para empleo o cargo público y para el ejercicio del derecho de sufragio pasivo por tiempo de nueve a doce años",
+      "Prisión de tres a seis años, multa de doce a veinticuatro meses, e inhabilitación especial para empleo o cargo público y para el ejercicio del derecho de sufragio pasivo por tiempo de nueve a doce años"
+    ],
+    correct: 3
+  },
+  {
+    question: "RGC Art.117.5 El hecho de no llevar instalado el vehículo los cinturones de seguridad cuando sea obligatorio de acuerdo con lo dispuesto en las normas reguladoras de los vehículos, tendrá la consideración de infracción:",
+    options: [
+      "Muy grave",
+      "Grave",
+      "Leve",
+      "Moderada"
+    ],
+    correct: 0
+  },
+  {
+    question: "REP Art.70 Contra las resoluciones relativas al servicio, del Consejo de Administración, de su Presidente y del Director del Puerto Autónomo, podrá interponerse recurso de alzada ante:",
+    options: [
+      "Ministerio de Fomento",
+      "Puerto del Estado",
+      "Delegado del Gobierno",
+      "Consejo de ministros"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.124 Dónde se constituirá un Comité de servicios portuarios:",
+    options: [
+      "Consejo de Navegación y Puertos",
+      "Consejo de Administración de la Autoridad Portuaria",
+      "Consejo Rector",
+      "Ministerio de Fomento"
+    ],
+    correct: 0
+  },
+  {
+    question: "RGC Art.117 Cuando los menores de doce años podrán utilizar como tal dispositivo el propio cinturón de seguridad para adultos de que estén dotados los asientos delanteros:",
+    options: [
+      "Cuando su estatura sea superior a 135 centímetros",
+      "Cuando su estatura sea igual o superior a 140 centímetros",
+      "Cuando su estatura superior a 150 centímetros",
+      "Cuando su estatura sea igual o superior a 135 centímetros"
+    ],
+    correct: 0
+  },
+  {
+    question: "REP Art.69 Las reclamaciones o quejas sobre los servicios dependientes del Puerto Autónomo se dirigirán en primera instancia a:",
+    options: [
+      "Presidente del Puerto",
+      "Comisaría de Explotación",
+      "Director del Puerto",
+      "Puertos del Estado"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.111.2 En el acuerdo de instrucción, que incluirá la determinación del número máximo de prestadores de un servicio portuario de interés general, se adoptará por:",
+    options: [
+      "Consejo Rector",
+      "Ministerio de Fomento",
+      "Consejo de Administración de la Autoridad Portuaria",
+      "Puertos del Estado"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.118 La transmisión de una licencia estará subordinada a la previa conformidad de:",
+    options: [
+      "Puertos del Estado",
+      "Ministerio de Fomento",
+      "La Autoridad Portuaria",
+      "Ministerio de Economía"
+    ],
+    correct: 2
+  },
+  {
+    question: "RGC 97.3 Cuando, independientemente de la hora del día, se deberá apagar el motor, conectar la señal de emergencia y mantener encendidas las luces de posición:",
+    options: [
+      "Cuando un conductor queda inmovilizado con su vehículo en una vía interurbana",
+      "Cuando un conductor queda inmovilizado con su vehículo dentro de un poblado",
+      "Cuando un conductor queda inmovilizado con su vehículo dentro de un túnel o paso inferior",
+      "Cuando un conductor queda inmovilizado con su vehículo en un puente"
+    ],
+    correct: 2
+  },
+  {
+    question: "LP Art.108 Cuál de estos servicios no se considera técnico-naútico:",
+    options: [
+      "Prácticaje",
+      "Remolque",
+      "Embarque y desembarque de pasajeros",
+      "Todos son técnico-naúticos"
+    ],
+    correct: 2
+  },
+  {
+    question: "Según el Reglamento de Servicio y Policía, obstaculizar con las escaleras o rampas de los buques el uso de las vías férreas o de ferrocarril y demás instalaciones de los muelles, se considera una infracción:",
+    options: [
+      "Leve",
+      "Grave",
+      "Muy grave",
+      "Moderada"
+    ],
+    correct: 0
+  },
+  {
+    question: "El plazo máximo para notificar resolución expresa sobre las solicitudes de licencia será de:",
+    options: [
+      "Dos meses",
+      "Un mes",
+      "Seis meses", 
+      "Tres meses"
+    ],
+    correct: 3
+  }
+];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = new Array(questions.length).fill(false);
+        let userAnswers = new Array(questions.length).fill(-1);
+        let currentQuestions = [...questions];
+        let autoAdvanceTimer = null;
+
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const prevButton = document.getElementById('prev-btn');
+        const nextButton = document.getElementById('next-btn');
+        const currentQuestionSpan = document.getElementById('current-question');
+        const totalQuestionsSpan = document.getElementById('total-questions');
+        const quizSection = document.getElementById('quiz-section');
+        const resultsSection = document.getElementById('results-section');
+        const shuffleButton = document.getElementById('shuffle-btn');
+        const progressFill = document.getElementById('progressFill');
+
+        totalQuestionsSpan.textContent = questions.length;
+
+        function updateProgressBar() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            progressFill.style.width = `${progress}%`;
+        }
+
+        function showQuestion(index) {
+            const question = currentQuestions[index];
+            questionElement.textContent = question.question;
+            optionsElement.innerHTML = '';
+            
+            question.options.forEach((option, i) => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.textContent = option;
+                
+                if (answered[index]) {
+                    if (i === question.correct) {
+                        button.classList.add('correct');
+                    }
+                    if (i === userAnswers[index] && i !== question.correct) {
+                        button.classList.add('incorrect');
+                    }
+                    if (i === userAnswers[index]) {
+                        button.classList.add('selected');
+                    }
+                } else {
+                    button.addEventListener('click', () => selectOption(button, i));
+                }
+                
+                optionsElement.appendChild(button);
+            });
+            
+            currentQuestionSpan.textContent = index + 1;
+            prevButton.disabled = index === 0;
+            nextButton.textContent = index === currentQuestions.length - 1 ? 'Finalizar' : 'Siguiente';
+            nextButton.disabled = !answered[index] && index !== currentQuestion;
+            updateProgressBar();
+        }
+
+        function selectOption(button, optionIndex) {
+            if (autoAdvanceTimer) {
+                clearTimeout(autoAdvanceTimer);
+            }
+            
+            const allOptions = optionsElement.children;
+            Array.from(allOptions).forEach(opt => opt.classList.remove('selected'));
+            button.classList.add('selected');
+            
+            if (!answered[currentQuestion]) {
+                answered[currentQuestion] = true;
+                userAnswers[currentQuestion] = optionIndex;
+                
+                if (optionIndex === currentQuestions[currentQuestion].correct) {
+                    score++;
+                    button.classList.add('correct');
+                } else {
+                    button.classList.add('incorrect');
+                    allOptions[currentQuestions[currentQuestion].correct].classList.add('correct');
+                }
+                
+                nextButton.disabled = false;
+                
+                autoAdvanceTimer = setTimeout(() => {
+                    if (currentQuestion < questions.length - 1) {
+                        currentQuestion++;
+                        showQuestion(currentQuestion);
+                    } else {
+                        showScore();
+                    }
+                }, 1000);
+            }
+        }
+
+        function showScore() {
+            const detailedResults = document.getElementById('detailed-results');
+            
+            quizSection.style.display = 'none';
+            resultsSection.style.display = 'block';
+
+            const percentage = (score / questions.length) * 100;
+            document.getElementById('total-correct').textContent = score;
+            document.getElementById('total-incorrect').textContent = questions.length - score;
+            document.getElementById('total-percentage').textContent = percentage.toFixed(1);
+
+            const scoreElement = document.getElementById('score');
+            scoreElement.innerHTML = '<h2>Resultado Final</h2>';
+
+            detailedResults.innerHTML = '';
+            
+            currentQuestions.forEach((question, index) => {
+                if (userAnswers[index] !== question.correct) {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+                    resultItem.innerHTML = `
+                        <div class="result-question">
+                            <strong>${question.question}</strong>
+                        </div>
+                        <div class="result-options">
+                            <p><strong>Respuesta correcta:</strong> ${question.options[question.correct]}</p>
+                        </div>
+                    `;
+                    detailedResults.appendChild(resultItem);
+                }
+            });
+
+            if (detailedResults.children.length === 0) {
+                detailedResults.innerHTML = '<h3>¡Felicitaciones! Has respondido todo correctamente</h3>';
+            }
+        }
+
+        function shuffleQuestions() {
+            for (let i = currentQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [currentQuestions[i], currentQuestions[j]] = [currentQuestions[j], currentQuestions[i]];
+            }
+        }
+
+        function resetQuiz(shuffle = false) {
+            if (autoAdvanceTimer) {
+                clearTimeout(autoAdvanceTimer);
+            }
+            
+            currentQuestion = 0;
+            score = 0;
+            answered = new Array(questions.length).fill(false);
+            userAnswers = new Array(questions.length).fill(-1);
+            
+            if (shuffle) {
+                shuffleQuestions();
+            } else {
+                currentQuestions = [...questions];
+            }
+            
+            quizSection.style.display = 'block';
+            resultsSection.style.display = 'none';
+            
+            showQuestion(currentQuestion);
+        }
+
+        prevButton.addEventListener('click', () => {
+            if (autoAdvanceTimer) {
+                clearTimeout(autoAdvanceTimer);
+            }
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (autoAdvanceTimer) {
+                clearTimeout(autoAdvanceTimer);
+            }
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            } else {
+                showScore();
+            }
+        });
+
+        document.getElementById('restart-btn').addEventListener('click', () => resetQuiz(false));
+
+        shuffleButton.addEventListener('click', () => {
+            if (confirm('¿Quieres mezclar las preguntas y empezar de nuevo?')) {
+                resetQuiz(true);
+            }
+        });
+
+        showQuestion(currentQuestion);
+    </script>
+</body>
+</html>

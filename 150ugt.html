@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test 150 UGT</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            min-height: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1a365d;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #000000;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #e2e8f0;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            line-height: 1.4;
+            font-weight: 600;
+            
+        }
+
+        .option-button {
+            padding: 15px 20px;
+            font-size: 1.1em;
+            background-color: #edf2f7;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .option-button:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        .option-button.selected {
+            background-color: #FFD700;
+            color: black;
+            border-color: #FFA500;
+        }
+
+        .option-button.correct {
+            background-color: #48bb78;
+            color: white;
+        }
+
+        .option-button.incorrect {
+            background-color: #f56565;
+            color: white;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .nav-button {
+            padding: 12px 24px;
+            font-size: 1.2em;
+            background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+            color: black;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(90deg, #FFA500 0%, #FF8C00 100%);
+        }
+
+        .nav-button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #results-section {
+            text-align: center;
+        }
+
+        .score-summary {
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+
+        #detailed-results {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .result-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #fff5f5;
+        }
+        #question {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            line-height: 1.4;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="quiz-section">
+            <h1>🏍️ MOTOS ACADEMY 🏍️</h1>
+            <h2>Test 150 UGT</h2>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <div class="progress-info">
+                <span>Pregunta <span id="current-question">1</span> de <span id="total-questions">15</span></span>
+            </div>
+            <div id="question"></div>
+            <div id="options" class="options-container"></div>
+            <div class="navigation">
+                <button id="prev-btn" class="nav-button">Anterior</button>
+                <button id="shuffle-btn" class="nav-button">Mezclar</button>
+                <button id="next-btn" class="nav-button">Siguiente</button>
+            </div>
+        </div>
+
+        <div id="results-section" style="display: none;">
+            <h2>Resultados del Test</h2>
+            <div id="score"></div>
+            <div class="score-summary">
+                <p>Correctas: <span id="total-correct">0</span></p>
+                <p>Incorrectas: <span id="total-incorrect">0</span></p>
+                <p>Porcentaje: <span id="total-percentage">0</span>%</p>
+            </div>
+            <div id="detailed-results"></div>
+            <button id="restart-btn" class="nav-button">Reiniciar</button>
+        </div>
+    </div>
+
+    <script>
+         const questions = [
+
+    {
+        question: "¿Cuál de estas afirmaciones es la correcta?",
+        options: [
+            "El Plan de Emergencia Interior de cada puerto se integrará en el correspondiente Plan de Emergencia Exterior en zonas portuarias que será elaborado, aprobado y homologado por las autoridades competentes en la materia",
+            "Corresponde acordar la declaración de aplicación del PEI: Al Capitán Marítimo, cuando el buque se encuentre implicado en la emergencia o en riesgo por la misma y a los Operadores de los Muelles o terminales, en los restantes casos",
+            "El Director del Puerto hará entrega a los Capitanes de los buques que lleguen al puerto de un plan de actuación para seguir por la tripulación en caso de emergencia",
+            "Todas las respuestas son incorrectas"
+        ],
+        correct: 0
+    },
+    {
+        question: "En el almacenamiento de MMPP en los puertos, el RD 145/89, establece:",
+        options: [
+            "El Director del Puerto, podrá conceder autorización por escrito para la permanencia o almacenamiento de mercancías peligrosas en la zona terrestre portuaria, hasta un plazo no superior a diez días hábiles",
+            "El Director del Puerto, en caso extraordinario debidamente justificado, podrá conceder autorización escrita para la permanencia o almacenamiento de mercancías peligrosas en la zona terrestre portuaria, a excepción siempre de las citadas en el artículo 15 por plazo superior a diez días, pero no mayor de veinte días hábiles",
+            "Se podrán almacenar explosivos de la División 1.4, Municiones de seguridad, en lugares cerrados y vigilados",
+            "Todas las respuestas son correctas"
+        ],
+        correct: 2
+    },
+    {
+        question: "En el almacenamiento de MMPP en los puertos, el RD 145/89, establece:",
+        options: [
+            "Clase 8. Sustancias corrosivas, pueden depositarse indistintamente en lugares abiertos o cerrados debidamente ventilados",
+            "Clase 4.2 Sustancias susceptibles de combustión espontánea: En lugares abiertos pero manteniéndolos secos",
+            "Clase 7. Sustancias radiactivas, prohibido su almacenamiento. En casos extraordinarios debidamente autorizados podrán por el plazo máximo improrrogable de cuatro días",
+            "Todas las respuestas son correctas"
+        ],
+        correct: 3
+    },
+    {
+        question: "¿Cuál de las siguientes afirmaciones es correcta?",
+        options: [
+            "El Director del Puerto deberá ordenar la inspección de todo buque que ofrezca dudas razonables respecto a la veracidad o exactitud del certificado que presente",
+            "El Capitán del buque, antes de iniciar las operaciones de carga y descarga de hidrocarburos, gases licuados y productos químicos a granel y durante las mismas, comprobará el cierre de exhaustaciones a la atmósfera",
+            "El Capitán del buque y el Director del Puerto, dentro de sus respectivas competencias, deberán asegurarse que el equipo a utilizar en las operaciones de carga y descarga de hidrocarburos, gases licuados y productos químicos a granel, es adecuado",
+            "Las mangueras flexibles deben cumplir que el coeficiente de seguridad no debe ser menor que diez veces la máxima presión de trabajo que ha de soportar"
+        ],
+        correct: 1
+    },
+    {
+        question: "Sobre la manipulación de contenedores conteniendo MMPP:",
+        options: [
+            "Se utilizará siempre que sea posible eslingas flexibles para la manipulación de los contenedores cargados con mercancías peligrosas. Spraders, al objeto de evitar inclinaciones o esfuerzos anormales sobre la estructura del mismo",
+            "El Capitán del Buque impedirá que persona alguna pueda abrir o entrar en un contenedor o abrir las válvulas de una cisterna o tanque portátil, sin la autorización escrita del Jefe de Seguridad",
+            "Los contenedores cargados de explosivos deben cargarse o descargarse directamente del vehículo al buque o viceversa",
+            "Todas las respuestas son incorrectas"
+        ],
+        correct: 2
+    },
+    {
+        question: "Las sustancias corrosivas están constituidas por sustancias que en estado natural tienen la propiedad de alterar o destruir los tejidos vivos, especialmente los tejidos humanos, atacan a la superficie de ciertos metales e igualmente a otras materias como las textiles, y se subdividen en:",
+        options: [
+            "Clase 8.1, sustancias corrosivas inflamables",
+            "Clase 8.2, sustancias que en contacto con el agua desprenden vapores corrosivos",
+            "a) y b) son correctas",
+            "a) y b) son incorrectas"
+        ],
+        correct: 3
+    },
+    {
+        question: "Sobre la clase 9, el RD 145/89, nos indica:",
+        options: [
+            "La mayoría de estas sustancias están comprendidas en la calificación PPG (potencialmente peligrosas a granel)",
+            "Si se envasa la mercancía con hielo seco, CO2, el envase o contenedor debe llevar el siguiente etiquetado 'Peligro, gas CO2 (hielo seco); ventilar antes de entrar'",
+            "La mercancía puede ser inflamable, mantener la prohibición de fumar y la presencia de fuentes de ignición o de calor en las cercanías",
+            "Todas las respuestas son correctas"
+        ],
+        correct: 3
+    },
+    {
+        question: "Entre las sustancias fisionables, se encuentran:",
+        options: [
+            "Plutonio-239 y el plutonio-241",
+            "Uranio-237 y el uranio-239, 233 y 235",
+            "Uranio natural no irradiado",
+            "Uranio empobrecido no irradiado"
+        ],
+        correct: 0
+    },
+    {
+        question: "Ante emergencias con materiales radioactivos, se actuará de la siguiente forma:",
+        options: [
+            "En incendios, utilizar equipos de respiración autónoma con presión positiva y trajes de protección",
+            "En pequeños incendios emplear extintores de polvo químico, de CO2 o de espuma",
+            "En incendios importantes emplear agua pulverizada con mangueras o monitores y controlar el agua empleada en la extinción antes de su evacuación",
+            "Todas las respuestas son correctas"
+        ],
+        correct: 3
+    },
+    {
+        question: "Definiciones de la Clase 7, materiales radioactivos:",
+        options: [
+            "La radiactividad es la propiedad que presentan ciertos radionucleidos de elementos químicos de desintegrarse espontáneamente en otros, emitiendo diversos tipos de radiaciones.",
+            "Se considera materia radiactiva aquella cuya actividad específica es mayor de 0,2 microcurios por gramo (74 Bq/g). ",
+            "La actividad de las sustancias radiactivas se mide por el número de desintegraciones que se producen en la unidad de tiempo. Como unidad se emplea generalmente el curio (Ci), que equivale a 37.000 millones de desintegraciones por hora.",
+            "Para medir los efectos biológicos se utiliza otra magnitud denominada dosis equivalente. La unidad de medida utilizada generalmente es el Rad."
+        ],
+        correct: 0
+    },
+    {
+        question: "Las sustancias de la división 6.1, incluidos los plaguicidas, se adscriben a uno de los tres grupos de embalaje/envase, según el riesgo que por su toxicidad presenten durante el transporte:",
+        options: [
+            "Grupo I de embalaje/envase: Sustancias y preparados que presentan un riesgo relativamente leve de intoxicación",
+            "Grupo II de embalaje/envase: Sustancias y preparados que presentan un riesgo grave de intoxicación",
+            "Grupo III de embalaje/envase: Sustancias y preparados nocivos que presentan un riesgo muy grave de intoxicación",
+            "Todas las respuestas son correctas"
+        ],
+        correct: 1
+    },
+    {
+        question: "Para la clase 6.2, los desinfectantes que recomienda utilizar el RD 145/89, son:",
+        options: [
+            "Uno de los que pueden utilizar es el hipoclorito en solución de 1.000 a 10.000 p.p.m., según la cantidad de materia orgánica, siendo muy eficaz para los bacilos tuberculosos",
+            "Los desinfectantes fenólicos son inactivos en la mayor gama de materias, pero en cambio son eficaces contra líquidos que contengan virus",
+            "El alcohol es efectivo contra protozoos y parásitos",
+            "El alcohol no es efectivo contra protozoos y parásitos"
+        ],
+        correct: 2
+    },
+    {
+        question: "Respecto a la Clase 4, Sólidos y otras sustancias inflamables, el RD 145/89, indica:",
+        options: [
+            "Vallar la zona peligrosa y evitar la entrada en la misma de personas sin protección",
+            "En caso de incendio, utilizar los elementos de extinción que fijan las instrucciones de emergencia, pero previamente utilizar agua, vapor o espuma",
+            "Si se observasen movimientos de las mercancías dentro de un envase o contenedor, moverlas hasta corregir el trincado",
+            "Ante derrames o goteos, desviar el líquido hacia las alcantarillas o desagües"
+        ],
+        correct: 0
+    },
+    {
+        question: "Sobre la Clase 5, Sustancias oxidantes y peróxidos orgánicos, el RD 145/89, indica:",
+        options: [
+            "La Clase 5.1, sustancias comburentes, pueden liberar oxígeno, provocar una combustión o contribuir a intensificarla",
+            "La Clase 5.2, Peróxidos orgánicos, son sustancias que pueden ser consideradas derivados de peróxidos de hidrógeno, en las que uno o ambos de los átomos de hidrógeno han sido reemplazados por radicales orgánicos",
+            "Las mercancías más frecuentes de la Clase 5.1, son los fertilizantes compuestos de nitrato amónico",
+            "Todas las respuestas son correctas"
+        ],
+        correct: 3
+    },
+    {
+        question: "Los peróxidos orgánicos son sustancias térmicamente inestables, capaces de autoacelerar su descomposición ¿Cuál de las propiedades siguientes no son propias de los peróxidos orgánicos?:",
+        options: [
+            "Causar daños a los ojos",
+            "Son altamente infecciosas",
+            "Arder con rapidez",
+            "Susceptibles de explotar por descomposición"
+        ],
+        correct: 1
+    },
+    {
+        question: "La clase III, líquidos inflamables, se subdivide en:",
+        options: [
+            "Clase 3.1. Punto de inflamación inferior a (-18) C (0 F) y Clase 3.2. Punto de inflamación igual o superior a (-18) C, pero inferior a 23 C (73 F)",
+            "Clase 3.3. Punto de inflamación igual o superior a 23 C, pero no superior a 61 C (142 F)",
+            "a) y b) son correctas",
+            "a) y b) son incorrectas"
+        ],
+        correct: 2
+    },
+    {
+        question: "Ante emergencias con gases, se actuará de la siguiente forma:",
+        options: [
+            "Se mantendrá al personal a sotavento del derrame para evitar los vapores tóxicos",
+            "En pequeños incendios aplicar extintores adecuados, pero nunca aplicaremos agua pulverizada sobre los recipientes",
+            "Detectado un incendio se avisará al Centro de Control de Emergencias y también a los servicios contra incendios dándoles toda la información posible",
+            "Si se detecta una fuga de gas de un recipiente, nunca debe procederse a su taponamiento por el riesgo de explosión"
+        ],
+        correct: 2
+    },
+    {
+        question: "En la Clase 2 (Gases), están incluidos:",
+        options: [
+            "Gases permanentes",
+            "Gases disueltos",
+            "Gases licuados",
+            "Todas las respuestas son correctas"
+        ],
+        correct: 3
+    },
+    {
+        question: "En los puertos que no dispongan del muelle alejado a que hace referencia el artículo 24 (lugar del puerto especialmente apartado donde se efectuarán las operaciones), ¿Quién determinará las cantidades máximas de explosivos de cada división que podrán admitirse en el mismo?",
+        options: [
+            "El Organismo Portuario correspondiente",
+            "El Ministerio de Defensa",
+            "El Ministerio de Fomento, a propuesta de Puertos del Estado",
+            "Puertos del Estado"
+        ],
+        correct: 0
+    },
+    {
+        question: "¿Cuál de las afirmaciones siguientes es la correcta?",
+        options: [
+            "Cuando se manipulen mercancías peligrosas de la Clase 1, se extremará la vigilancia sobre las prohibiciones de fumar y de acercar cualquier fuente de ignición o de calor a menos de 100 metros del lugar donde aquellas se manipulen",
+            "La División 1.3, son sustancias que presentan riesgos de explosión en toda la masa",
+            "La División 1.5, son sustancias que no presentan ningún riesgo considerable. Son sustancias muy insensibles que presentan riesgos de explosión en toda su masa",
+            "Los explosivos del grupo de compatibilidad 'L' no podrán ser manipulados con ningún explosivo perteneciente a los demás grupos de compatibilidad"
+        ],
+        correct: 3
+    },
+    {
+        question: "Las etiquetas que debe llevar adherida cada bulto constituido por mercancías peligrosas, deberá:",
+        options: [
+            "Tanto en su constitución, colores, números y anotaciones deberán ser de tal condición que puedan ser identificadas tras dos meses de inmersión en agua del mar",
+            "Las dimensiones de estas etiquetas deberán ser de 100 x 100 milímetros",
+            "Estarán divididas en dos mitades, la parte inferior reservada al símbolo, que expresa gráficamente el riesgo de la mercancía y la parte superior para los números de la clase",
+            "Tener la forma de un rombo, cuyos lados forman un ángulo de 90 grados con la horizontal"
+        ],
+        correct: 1
+    },
+    {
+        question: "A efectos de rotulado, las Unidades de Transporte deberán llevar los siguientes rótulos:",
+        options: [
+            "Los contenedores, cuatro. Uno a cada lado y en cada frente",
+            "Los tanques portátiles, cuatro. Uno a cada lado y en cada frente",
+            "Los vagones de ferrocarril dos. Uno en cada lado",
+            "Todas son correctas"
+        ],
+        correct: 3
+    },
+    {
+        question: "¿Cuál de estas afirmaciones sobre la circulación de ferrocarriles en muelles o terminales es la correcta?",
+        options: [
+            "El Director del puerto deberá asegurarse que las locomotoras son las adecuadas para el transporte de MMPP",
+            "El Director del puerto deberá asegurarse que se ha establecido un sistema de señales, entre el personal de los vagones, los del muelle y los de a bordo de modo que cubra todas las fases de las operaciones",
+            "El Director del puerto deberá asegurarse que todos los vagones, a fin de evitar descargas electrostáticas, estarán continuamente puestos a tierra cuando se opere con gases o líquidos inflamables",
+            "El Director del puerto deberá asegurarse que finalizada la carga o descarga y antes de mover los vagones, todas las válvulas, salvo las de seguridad, se han cerrado y no existen fugas apreciables"
+        ],
+        correct: 0
+    },
+    {
+        question: "Las mercancías peligrosas se clasifican, según el RD 145/89, en:",
+        options: [
+            "Clase 3. Líquidos y sólidos inflamables",
+            "Clase 5. Sustancias (agentes) comburentes y peróxidos orgánicos",
+            "Clase 6. Sustancias tóxicas y corrosivas",
+            "Ninguna de las anteriores"
+        ],
+        correct: 1
+    },
+    {
+        question: "El Operador del muelle o terminal, antes de iniciarse las operaciones de carga/descarga de MMPP, comprobará lo siguiente:",
+        options: [
+            "Que la superficie del muelle correspondiente al atraque del buque se encuentre limpia, ordenada y libre de toda obstrucción",
+            "Prohibir que participen en las operaciones de manipulación de mercancías peligrosas a toda persona que se encuentre bajo los efectos del alcohol o de drogas, o en condiciones físicas o psíquicas inadecuadas",
+            "Que las mercancías llegadas al muelle o terminal, responden al informe entregado con la solicitud de admisión, en cantidad y clase",
+            "Todas son correctas"
+        ],
+        correct: 3
+    },
+    {
+        question: "Para los buques que operen con mercancías peligrosas, el RD 145/89 establece:",
+        options: [
+            "Deberán tener izada durante el día la bandera «B» del Código Internacional de Señales",
+            "Durante la noche, en lugar visible en todo el horizonte, una luz roja de un alcance mínimo de tres millas, situada por encima de las demás luces de a bordo",
+            "a) y b) son incorrectas",
+            "a) y b) son correctas"
+        ],
+        correct: 3
+    },
+    {
+        question: "El Capitán de un buque que opere con MMPP está obligado a tomar las siguientes medidas:",
+        options: [
+            "Tener preparado a proa del buque un alambre de remolque, de forma que sus gazas queden un metro del agua, al objeto de que puedan ser tomadas fácilmente por los remolcadores, por si fuese necesario desatracarlo y conducirlo fuera del puerto en caso de emergencia",
+            "Mantener el buque, durante la estancia en puerto con MMPP, con las máquinas propulsoras listas para salir del mismo en cualquier momento",
+            "a) y b) son correctas. Solo la b)",
+            "a) y b) son incorrectas. Solo la a)"
+        ],
+        correct: 1
+    },
+    {
+        question: "Las mercancías peligrosas en cantidades limitadas irán acompañadas del correspondiente:",
+        options: [
+            "Certificado de cumplimiento",
+            "Certificado de arrumación",
+            "Certificado de aptitud",
+            "Certificado de limitación de MMPP"
+        ],
+        correct: 0
+    },
+    {
+        question: "Respecto a atraques y fondeaderos especialmente habilitados, el RD 145/89 establece:",
+        options: [
+            "El Director del Puerto fijará, en zonas alejadas del tráfico normal del puerto, fondeaderos con o sin boyas de amarre para su utilización por buques que transporten mercancías peligrosas, en espera de atraque o de poder proceder a la salida del puerto",
+            "Cuando en un puerto se carguen o descarguen periódicamente explosivos de la División 1.1, 1.2 y 1.3 en cantidades superiores a los 400 kilogramos por escala, la designación del lugar del puerto especialmente apartado donde se efectuarán las operaciones, será realizada por el Ministerio de Fomento a propuesta razonada del Organismo portuario",
+            "Cuando en un puerto se carguen o descarguen periódicamente explosivos de la División 1.1 en cantidades superiores a los 400 kilogramos por escala, la designación del lugar del puerto especialmente apartado donde se efectuarán las operaciones, será realizada por el Ministerio de Defensa a propuesta razonada del Organismo portuario",
+            "Puertos del Estado dictará las normas técnicas que deban cumplir las obras e instalaciones de los muelles o atraques de terminales habilitados para MMPP"
+        ],
+        correct: 2
+    },
+    {
+        question: "Según el RD 145/89, se consideran viajes internacionales cortos:",
+        options: [
+            "Aquellos viajes en el curso de los cuales un buque no se aleja más de 200 millas de un puerto, sin que la distancia entre el último puerto de escala del país donde comienza el viaje y el puerto final de destino exceda de 600 millas.",
+            "Los viajes entre puertos nacionales, estén situados éstos en la Península, archipiélago Balear o Canario, o Ceuta y Melilla, se considerarán viajes internacionales cortos.",
+            "A y B son correctas",
+            "A y B son incorrectas"
+        ],
+        correct: 0
+    },
+    {
+        question: "¿Qué organización aprobó un conjunto de enmiendas al Convenio SOLAS de 1974 para la seguridad de la vida humana en el mar, así como un Código internacional para la protección de los buques y de las instalaciones portuarias (Código PBIP)?",
+        options: [
+            "El Consejo de Seguridad de la ONU.",
+            "La Organización Internacional del Trabajo junto a la Comisión Marítima Europea.",
+            "La Organización Marítima Internacional, organismo especializado de la Unión Europea, con sede en Londres.",
+            "La Organización Marítima Internacional, organismo especializado de la ONU, con sede en Londres."
+        ],
+        correct: 3
+    },
+    {
+        question: "¿Cuáles son los objetivos principales del Reglamento 725/2004 CE?",
+        options: [
+            "Instaurar y aplicar medidas comunitarias que mejoren la protección de los buques utilizados tanto en el comercio internacional como en el tráfico nacional.",
+            "Instaurar y aplicar medidas comunitarias que mejoren la protección de los buques utilizados solo en el comercio internacional.",
+            "Instaurar y aplicar medidas comunitarias que mejoren la protección de los buques utilizados solo en el comercio intracomunitario.",
+            "Ninguna de las anteriores respuestas es correcta."
+        ],
+        correct: 0
+    },
+    {
+        question: "¿Cuál de las disposiciones siguientes de la Parte B del Código PBIP, deberán observar los Estados miembros de la UE como si fueran obligatorias, según el Reglamento 725/2004 CE?",
+        options: [
+            "Periodicidad de los ejercicios y prácticas de protección que deben realizar las dotaciones de los buques, así como los oficiales de protección de buques y de las compañías.",
+            "Normas mínimas aplicables al plan de protección de la instalación portuaria.",
+            "Protección de la confidencialidad de los planes y evaluaciones de protección.",
+            "Todas las anteriores afirmaciones son correctas."
+        ],
+        correct: 3
+    },
+    {
+        question: "¿Cuál de las siguientes afirmaciones es correcta?",
+        options: [
+            "La parte A del código PBIP es orientativa para los estados miembros.",
+            "Punto de contacto para la protección marítima es quien combina las medidas preventivas que se  destinan a proteger el transporte marítimo en una instalación portuaria.",
+            "La parte B de código PBIP es obligatoria para los estados miembros.",
+            "Tráfico marítimo internacional es todo enlace por mar en barco entre una instalación portuaria situada en un Estado miembro y otra situada fuera del mismo, o a la inversa."
+        ],
+        correct: 3
+    },
+    {
+        question: "Interfaz buque-puerto es:",
+        options: [
+            "Interacción que tiene lugar cuando en una instalación portuaria se realizan actividades que entrañan el movimiento de mercancías o la provisión de servicios portuarios para los servicios regulares terrestres",
+            "Interacción que tiene lugar cuando un buque se ve afectado directa e inmediatamente por actividades que entrañan el movimiento de personas o mercancías o la provisión de servicios portuarios al buque o desde éste",
+            "Zona protegida de una instalación portuaria donde se realiza el fondeo, atraque definitivo o de espera y donde están ubicados los accesos desde el mar y zona terrestre",
+            "Todas las respuestas anteriores son incorrectas"
+        ],
+        correct: 1
+    },
+    {
+        question: "Según el Reglamento 725/2004 CE, ¿Qué es un acto ilícito deliberado?",
+        options: [
+            "Acto deliberado que pueda perjudicar solo a los buques utilizados en el tráfico marítimo intracomunitario, a su pasaje o a su carga, o a las instalaciones portuarias asociadas a los mismos",
+            "Acto deliberado que pueda perjudicar tanto a los buques utilizados en el tráfico marítimo internacional como en el nacional, a su pasaje o a su carga, o a las instalaciones portuarias asociadas a los mismos",
+            "No hay más opciones en el documento original",
+            "No hay más opciones en el documento original"
+        ],
+        correct: 1
+    },
+    {
+        "question": "Según el artículo 3.7 del Reglamento 725/2004 CE, lo prescrito en el Reglamento 725/2004 CE, no se aplicará a:",
+        "options": [
+            "A los buques de guerra o de transporte de tropas",
+            "A los buques carentes de propulsión mecánica",
+            "A los buques de madera y construcción primitiva",
+            "Todas las anteriores afirmaciones son correctas"
+        ],
+        "correct": 3
+    },
+    {
+        "question": "Cada Estado miembro comunicará los datos de contacto de los funcionarios en caso de expulsión de un buque de un puerto de la UE o de prohibición de acceso al mismo a:",
+        "options": [
+            "A la OMI y a la Comisión",
+            "A los demás Estados miembros y a la OMI",
+            "A la Comisión y a los demás Estados miembros de la UE",
+            "A la OMI, a la OIT y al OPIP de la Instalación Portuaria afectada"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "Cuando un buque sujeto a lo prescrito en las medidas especiales para incrementar la protección marítima del Convenio SOLAS y el Código PBIP, anuncie su intención de entrar en un puerto de un Estado miembro, la autoridad de protección marítima competente, exigirá que se le facilite la información requerida:",
+        "options": [
+            "Con 48 horas de antelación como mínimo",
+            "Dos horas antes del atraque del buque en el Puerto",
+            "A más tardar, seis horas antes de que el buque salga del puerto anterior, si la duración del viaje es inferior a 24 horas",
+            "Si no se conoce el puerto de escala o si éste se modifica durante el viaje, desde el momento en que ese puerto de escala sea conocido"
+        ],
+        "correct": 3
+    },
+    {
+        "question": "Según lo dispuesto en el Reglamento 725/2004 CE, ¿Cuál de las siguientes afirmaciones es la correcta?",
+        "options": [
+            "Todo el personal que lleve a cabo inspecciones de protección o que esté encargado del tratamiento de información confidencial relacionada con el Reglamento nunca deberá ser sometido a un control de seguridad por parte del Estado miembro del que sea nacional",
+            "No hay exenciones del suministro de información sobre protección antes de la entrada de un buque en un puerto",
+            "La OMI asumirá las tareas administrativas y de control derivadas de las disposiciones de las medidas especiales para incrementar la protección marítima del Convenio SOLAS y del Código PBIP",
+            "La Comisión estará asistida por un Comité y éste aprobará su reglamento interno"
+        ],
+        "correct": 3
+    },
+    {
+        "question": "Según lo dispuesto en el Reglamento 725/2004 CE, ¿Cuál de las siguientes afirmaciones es la correcta?",
+        "options": [
+            "Interfaz buque-puerto: todo acto o circunstancia que levante sospechas y que constituya una amenaza para la protección de un buque",
+            "Actividad de buque a buque: toda actividad relacionada con una instalación portuaria que suponga el traslado de mercancías o personas de un buque a otro",
+            "Nivel de protección: interacción que tiene lugar cuando un buque se ve afectado directa e inmediatamente por actividades que entrañan el movimiento de personas o mercancías o la provisión de servicios portuarios al buque o desde éste",
+            "a), b) y c) son incorrectas"
+        ],
+        "correct": 3
+    },
+    {
+        "question": "Organización de Protección Reconocida, según el Reglamento 725/2004 CE es:",
+        "options": [
+            "Una organización debidamente especializada en cuestiones de protección autorizada para realizar una actividad de evaluación prescrita en la parte A del Código PBIP",
+            "Una organización debidamente especializada en cuestiones de protección autorizada para realizar una actividad de evaluación o de verificación, prescrita en la parte A del Código PBIP",
+            "Una organización debidamente especializada en cuestiones de protección autorizada para realizar una actividad de evaluación, o de verificación, o de aprobación o de certificación prescrita en la parte A del Código PBIP",
+            "Una Organización de protección Reconocida, solo puede asesorar, nunca evaluar, verificar, aprobar o certificar lo prescrito en la parte A del Código PBIP"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "Al activarse, el sistema de alerta de protección del buque:",
+        "options": [
+            "Enviará la alerta de protección a los buques cercanos",
+            "Iniciará y transmitirá automáticamente una alerta de protección buque-tierra a una autoridad competente designada por la Administración",
+            "Activará todas las alarmas instaladas a bordo",
+            "Iniciará y transmitirá manualmente una alerta de protección buque-tierra a una autoridad competente designada por la Administración"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "Cuando un buque atracado en un puerto, no presente ante los funcionarios debidamente autorizados, el certificado internacional de protección del buque, podrán imponer al buque las siguientes medidas:",
+        "options": [
+            "Inspección del buque pero nunca la detención del mismo",
+            "Inspección del buque, restricción de sus operaciones pero no los movimientos dentro del puerto",
+            "Expulsión del buque del puerto",
+            "Inspección del buque, demora del buque, detención del buque, restricción de sus operaciones sin incluir los movimientos dentro del puerto o expulsión del buque del puerto"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "Con respecto al Código PBIP (ISPS Code):",
+        "options": [
+            "El Código PBIP fue aprobado por la Conferencia Diplomática de los Estados miembros de la UE, por acuerdo de la Comisión Europea",
+            "Fue aprobado en la OMI, por la Comisión Europea de Transportes y por el FRONTEX",
+            "El Convenio SOLAS está incluido dentro del Código PBIP",
+            "Ninguna de las anteriores respuestas son correctas"
+        ],
+        "correct": 3
+    },
+    {
+        "question": "En el Código PBIP hay tres niveles de protección. El nivel dos es:",
+        "options": [
+            "El nivel en el cual deberán mantenerse más medidas concretas de protección durante un período de tiempo ilimitado cuando sea probable o inminente un suceso que afecte a la protección marítima, siempre que sea posible determinar el blanco concreto",
+            "El nivel en el cual deberán mantenerse medidas mínimas adecuadas de protección en todo momento",
+            "El nivel en el cual deberán mantenerse medidas adecuadas de protección adicionales durante un período de tiempo ilimitado, como resultado de un aumento del riesgo de que ocurra un suceso que afecte a la protección marítima",
+            "El nivel en el cual deberán mantenerse medidas adecuadas de protección adicionales durante un período de tiempo, como resultado de un aumento del riesgo de que ocurra un suceso que afecte a la protección marítima"
+        ],
+        "correct": 3
+    },
+    {
+        "question": "El Código PBIP se aplica a los siguientes tipos de buques dedicados a viajes internacionales:",
+        "options": [
+            "Buques de pasaje, incluidas las naves de pasaje de gran velocidad",
+            "Buques de carga, de arqueo bruto igual o superior a 500 GT",
+            "Unidades móviles de perforación mar adentro",
+            "a), b) y c) son correctas"
+        ],
+        "correct": 3
+    },
+    {
+        "question": "En el Código PBIP, la responsabilidad de los Gobiernos Contratantes abarca el establecer los niveles de protección, para ello tendrán en cuenta:",
+        "options": [
+            "Si hay o no aprobadas las evaluaciones de protección y los planes correspondientes en las instalaciones y buques afectados",
+            "Las amenazas en otros puertos afectados por las rutas de origen y destino de los buques de pabellón del Gobierno Contratante del que se trate",
+            "En qué medida es creíble la información sobre la amenaza",
+            "a) y b) son correctas"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "Los Gobiernos Contratantes no podrán delegar en una Organización de Protección Reconocida las siguientes tareas en materia de protección:",
+        "options": [
+            "Aprobación de una evaluación de la protección de la instalación portuaria pero nunca las enmiendas posteriores a una evaluación aprobada, que deben ser ratificadas por la OMI",
+            "Aprobación de un plan de protección de la instalación portuaria y enmiendas posteriores a un plan aprobado",
+            "a) y b) son correctas",
+            "a) y b) son incorrectas"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "¿Cuándo puede un buque solicitar que se cumplimente una declaración de protección marítima?",
+        "options": [
+            "Cuando el buque funcione a un nivel de protección menos elevado que la instalación portuaria",
+            "Cuando el buque esté realizando actividades de buque a buque con otro buque que no esté obligado a tener e implantar un plan de protección del buque aprobado",
+            "Un buque nunca puede solicitar cumplimentar una declaración de protección marítima, solo es competencia de la Instalación portuaria con autorización del Gobierno Contratante",
+            "b) y c) son correctas"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "¿Quién puede cumplimentar la declaración de protección marítima?",
+        "options": [
+            "El capitán del buque",
+            "El Oficial de Protección del buque",
+            "Los buques no cumplimentan las declaraciones de protección marítima",
+            "a) y b) son correctas"
+        ],
+        "correct": 3
+    },
+    {
+        "question": "¿Cuál es la respuesta correcta?",
+        "options": [
+            "La instalación portuaria deberá actuar con arreglo a los niveles de protección establecidos por la OMI",
+            "La evaluación de la protección de la instalación portuaria será realizada por el Gobierno Contratante y se podrá delegar en una Organización de Protección Reconocida",
+            "La evaluación de la protección de la instalación portuaria será realizada por el Gobierno Contratante y no se podrá delegar en una Organización de Protección Reconocida",
+            "Cuando se comunique a un oficial de protección de una instalación portuaria que un buque se encuentra en un nivel de protección más alto que el de la instalación portuaria, dicho oficial denegará la entrada a ese buque hasta que suba al mismo nivel de protección que la IP"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "El Oficial de Protección de un buque:",
+        "options": [
+            "Habrá un solo Oficial por buque",
+            "Coordinará los aspectos de protección de la manipulación de la carga y de las provisiones del buque con otro personal del buque y con los oficiales de protección de las instalaciones portuarias",
+            "a) y b) son incorrectas",
+            "a) y b) son correctas"
+        ],
+        "correct": 3
+    },
+    {
+        "question": "¿Cuál de las siguientes afirmaciones no es correcta?",
+        "options": [
+            "La compañía se asegurará de que el plan de protección del buque contiene una declaración en la que se destaca claramente la autoridad del capitán",
+            "La última palabra sobre la protección de un buque la tiene el Oficial de Protección del Buque",
+            "Los Gobiernos Contratantes especificarán el período mínimo por el que las instalaciones portuarias situadas dentro de su territorio deberán conservar las declaraciones de protección marítima",
+            "Los buques están obligados a actuar con arreglo a los niveles de protección establecidos por los Gobiernos Contratantes"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "¿Qué afirmación es la correcta?",
+        "options": [
+            "La evaluación de la protección del buque es parte integrante y esencial del proceso de elaboración y actualización del plan de protección del buque",
+            "El plan de protección del buque es parte integrante y esencial del proceso de elaboración y actualización de la evaluación de la protección del buque",
+            "La instalación portuaria documentará, examinará, aceptará y conservará la evaluación de la protección del buque",
+            "Una Organización de Protección Reconocida puede no preparar el plan de protección para un determinado buque"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "Los Oficiales de Protección de las Compañías Marítimas:",
+        "options": [
+            "Podrá desempeñar este cargo respecto de un solo buque",
+            "Solo habrá un Oficial Protección de la Compañía Marítima por cada Compañía",
+            "Aprobar el Plan de Protección del buque",
+            "Organizar las verificaciones iniciales y siguientes del buque por la Administración o la organización de protección reconocida"
+        ],
+        "correct": 3
+    },
+    {
+        "question": "En los planes de protección de las instalaciones portuarias:",
+        "options": [
+            "Pueden haber tantos planes como se requieran",
+            "El plan comprenderá como mínimo, dos de los tres niveles de protección que se definen en la parte A del Código",
+            "Estará redactado solo en ingles y francés",
+            "Podrá combinarse con el plan de protección del puerto o cualquier otro plan del puerto para situaciones de emergencia"
+        ],
+        "correct": 3
+    },
+    {
+        "question": "¿Cuál de estas afirmaciones es correcta?",
+        "options": [
+            "Pueden haber varios Oficiales de Protección en una misma Instalación portuaria",
+            "Una misma persona podrá ser Oficial de Protección de varias instalaciones portuarias",
+            "Entre sus responsabilidades está la de aprobar el plan de protección de la instalación portuaria y realizar prácticas con él",
+            "Realizará periódicamente inspecciones de protección a los buques para asegurarse de que las medidas de protección siguen siendo adecuadas"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "Los buque deberán realizar las siguientes verificaciones:",
+        "options": [
+            "Una verificación inicial antes de que el buque cumpla el año",
+            "Una verificación de renovación a intervalos especificados por la Administración, pero que no excedan de cinco años",
+            "Al menos tres verificaciones intermedias",
+            "Todas las respuestas son correctas"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "Los delitos podrán ser cometidos por omisión:",
+        "options": [
+            "No, en ningún caso",
+            "Sí, siempre",
+            "Cuando el omitente haya creado una ocasión de riesgo para el bien jurídicamente protegido",
+            "Cuando se produzca el fallecimiento de alguna persona, y no se produzca acto alguno por el omitente"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "Las disposiciones relativas a la responsabilidad penal de las personas jurídicas:",
+        "options": [
+            "No serán aplicables al Estado, a las Administraciones públicas territoriales e institucionales, a los Organismos Reguladores, las Agencias y Entidades públicas Empresariales",
+            "Serán aplicables al Estado, a las Administraciones públicas territoriales e institucionales, a los Organismos Reguladores, las Agencias y Entidades públicas Empresariales",
+            "No serán aplicables al Estado pero si a las organizaciones internacionales de derecho público",
+            "No serán aplicables al Estado, a las Administraciones públicas territoriales e institucionales, pero sí a los Organismos Reguladores, las Agencias y Entidades públicas Empresariales"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "El que, en estado de necesidad, para evitar un mal propio o ajeno lesione un bien jurídico de otra persona o infrinja un deber, siempre que el mal causado no sea mayor que el que se trate de evitar:",
+        "options": [
+            "Estará exento de responsabilidad criminal",
+            "No estará exento de responsabilidad criminal",
+            "Se le aplicará la pena inferior en dos o tres grados",
+            "Se le aplicará la pena en su mitad inferior"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "El actuar el culpable a causa de su grave adicción a las sustancias estupefacientes:",
+        "options": [
+            "Fija la pena en la mitad superior",
+            "Es una causa atenuante",
+            "Excluye la responsabilidad criminal",
+            "Delimita la pena a la mitad"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "El error invencible sobre un hecho constitutivo de la infracción penal:",
+        "options": [
+            "Fija la pena en la mitad superior",
+            "No excluye la responsabilidad criminal",
+            "Excluye la responsabilidad criminal",
+            "Delimita la pena a la mitad"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "En los ciclomotores y en las motocicletas, además del conductor y, en su caso, del ocupante del sidecar de éstas, puede viajar, siempre que así conste en su licencia o permiso de circulación, un pasajero que sea:",
+        "options": [
+            "mayor de 10 años",
+            "menor de 12 años",
+            "Mayor de 12 años",
+            "Nunca ningún menor de edad"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "En el resto de los vehículos no destinados exclusivamente al transporte de mercancías la carga:",
+        "options": [
+            "podrá sobresalir por la parte posterior hasta un 25 por ciento de su longitud, y si fuera indivisible, un 15 por ciento",
+            "podrá sobresalir por la parte posterior hasta un 20 por ciento de su longitud, y si fuera indivisible, un 25 por ciento",
+            "podrá sobresalir por la parte posterior hasta un 30 por ciento de su longitud, y si fuera indivisible, un 15 por ciento",
+            "podrá sobresalir por la parte posterior hasta un 10 por ciento de su longitud, y si fuera indivisible, un 15 por ciento"
+        ],
+        "correct": 3
+    },
+    {
+        "question": "Las infracciones referentes al número de personas transportadas en un vehículo, en cuanto impliquen una ocupación excesiva del vehículo que suponga aumentar en un 50 por ciento el número de plazas autorizadas, excluida la del conductor, con excepción de los autobuses de líneas urbanas e interurbanas, tendrán la consideración de:",
+        "options": [
+            "muy graves",
+            "Leves",
+            "Faltas",
+            "graves"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "Los supuestos de parada o estacionamiento en lugares distintos de los fijados por los agentes de la autoridad responsable del tráfico tendrán la consideración de:",
+        "options": [
+            "Infracción leve",
+            "Infracción muy grave",
+            "Infracción grave",
+            "Falta"
+        ],
+        "correct": 2
+    },
+    {
+        "question": "Quién establecerá la regulación básica en lo referente a los resaltos en los pasos para peatones y bandas transversales:",
+        "options": [
+            "El Ministerio del interior",
+            "El Ministerio de Fomento",
+            "Dirección General de Tráfico",
+            "Ayuntamientos"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "Una vez incautadas las mercancías u objetos por el Puerto Autónomo, si el dueño o Consignatario de la mercancía no las reclamasen, se procederá a su venta en pública subasta, previo anuncio en el Boletín Oficial de la Provincia con una anticipación de:",
+        "options": [
+            "Diez días",
+            "Quince días",
+            "Treinta días",
+            "Sesenta días"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "Según el Reglamento de Servicio y Policía, el estacionamiento o circulación de vehículos y maquinaria en el interior de los recintos portuarios que no constituyendo infracción del Código de Circulación, incumpla las normas establecidas en los artículos 13º y 15º de este Reglamento, se considera una infracción:",
+        "options": [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "Según el Reglamento de Servicio y Policía, cualquiera de las infracciones que ocasionara lesión grave a alguna persona o daño o perjuicio superiores a 3000 euros, se considera una infracción:",
+        "options": [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        "correct": 1
+    },
+    {
+        "question": "Según el Reglamento de Servicio y Policía, la aportación de datos inexactos que puedan producir liquidaciones erróneas del Puerto Autónomo de Valencia con importes inferiores a los que se deducirían de la aportación de los datos correctos, se considera una infracción:",
+        "options": [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        "correct": 1
+    },
+    {
+        question: "Según el Reglamento de Servicio y Policía, el acceso de personas o vehículos a las zonas de acceso restringido, sin la correspondiente autorización administrativa, se considera una infracción:",
+        options: [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        correct: 0
+    },
+    {
+        question: "Según el Reglamento de Servicio y Policía, la descarga en muelles distinto a los fijados por la Dirección del Puerto Autónomo de mercancías de buques en peligro por razones de estiba o corrimiento de carga, se considera una infracción:",
+        options: [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        correct: 0
+    },
+    {
+        question: "Según el Reglamento de Servicio y Policía, producir derrames por negligencia en la manipulación y transporte de la mercancía sobre el muelle, o que estos resulten anormales, se considera una infracción:",
+        options: [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        correct: 1
+    },
+    {
+        question: "Según el Reglamento de Servicio y Policía, depositar mercancías peligrosas en sitios distintos de los designados para ello por la Dirección del Puerto Autónomo, se considera una infracción:",
+        options: [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        correct: 1
+    },
+    {
+        question: "Según el Reglamento de Servicio y Policía, la falsedad en los documentos presentados para adquirir la condición de censado en el censo de Compradores de Pescado, se considera una infracción:",
+        options: [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        correct: 1
+    },
+    {
+        question: "Según el Reglamento de Servicio y Policía, no comunicar a la Comisaría de Explotación, con la antelación establecida por la Dirección del Puerto Autónomo, la demora en el comienzo de las operaciones de manipulación de mercancía, se considera una infracción:",
+        options: [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        correct: 0
+    },
+    {
+        question: "Según el Reglamento de Servicio y Policía, no desmontar las instalaciones de cerramiento provisional en las concesiones de uso de terrenos de las Zonas de Servicio, se considera una infracción:",
+        options: [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        correct: 1
+    },
+    {
+        question: "Según el Reglamento de Servicio y Policía, no realizar el desatraque de un buque, por no haber aceptado trabajar en horas extras, en días festivos, o en turnos no habituales, cuando lo haya solicitado otro buque para trabajar en el atraque que ocupa, en tales circunstancias, se considera una infracción:",
+        options: [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        correct: 1
+    },
+    {
+        question: "Según el Reglamento de Servicio y Policía, obstaculizar con las escaleras o rampas de los buques el uso de las vías férreas o de ferrocarril y demás instalaciones de los muelles, se considera una infracción:",
+        options: [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        correct: 0
+    },
+    {
+        question: "Según el Reglamento de Servicio y Policía, no colocar entre los buques y los muelles dispositivos que impidan eficazmente la caída de mercancías susceptibles de derrames sobre el agua, durante las operaciones de manipulación de las mismas, se considera una infracción:",
+        options: [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        correct: 1
+    },
+    {
+        question: "Las reclamaciones o quejas sobre los servicios dependientes del Puerto Autónomo se dirigirán en primera instancia a:",
+        options: [
+            "Presidente del Puerto",
+            "Comisaria de Explotación",
+            "Director del Puerto",
+            "Puertos del Estado"
+        ],
+        correct: 2
+    },
+    {
+        question: "Según el Reglamento de Servicio y Policía, no respetar el turno de atraques, se considera una infracción:",
+        options: [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        correct: 1
+    },
+    {
+        question: "Contra las resoluciones relativas al servicio, del Consejo de Administración, de su Presidente y del Director del Puerto Autónomo, podrá interponerse recurso de alzada ante:",
+        options: [
+            "Ministerio de Fomento",
+            "Puerto del Estado",
+            "Delegado del Gobierno",
+            "Consejo de ministros"
+        ],
+        correct: 2
+    },
+    {
+        question: "Según el Reglamento de Servicio y Policía, El depósito o el acopio de mercancías, materiales, útiles o herramientas sin autorización, o el abandono de basuras, escombros, residuos o materias o sustancias fétidas en terrenos, instalaciones, obras o equipos portuarios o cualquier hecho que afectara el estado de limpieza de dichos bienes, se considera una infracción:",
+        options: [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        correct: 0
+    },
+    {
+        question: "Según el Reglamento de Servicio y Policía, la reventa dentro de las zonas portuarias de los productos de la pesca adquiridos en subasta, así como su venta al detalle, se considera una infracción:",
+        options: [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Moderada"
+        ],
+        correct: 0
+    },
+    {
+        question: "¿Cuándo será responsable el Puerto Autónomo, de los daños o pérdidas de las mercancías u objetos de cualquier clase que se depositen en sus almacenes o en otra superficie de los muelles?",
+        options: [
+            "En caso de incendio",
+            "En ningún caso",
+            "En caso de robo",
+            "En caso de accidente"
+        ],
+        correct: 1
+    },
+    {
+        question: "La entrega del boletín de denuncia servirá de notificación y pliego de cargos en el supuesto de infracciones de carácter:",
+        options: [
+            "Leve",
+            "Muy Grave",
+            "Grave",
+            "Todas las anteriores son correctas"
+        ],
+        correct: 0
+    },
+    {
+        question: "La edad de jubilación de los prácticos de puerto, podrá prorrogarse hasta los:",
+        options: [
+            "70 años",
+            "75 años",
+            "67 años",
+            "68 años"
+        ],
+        correct: 0
+    },
+    {
+        question: "¿A quién corresponderá la aprobación del Reglamento General y del modelo de Ordenanzas Portuarias?",
+        options: [
+            "Puertos del Estado",
+            "Ministerio del Interior",
+            "Ministerio de Fomento",
+            "Consejo de Ministro"
+        ],
+        correct: 2
+    },
+    {
+        question: "La negativa del capitán a mantener a bordo un polizón hasta su entrega a las autoridades competentes o a las que éstas dispongan, se considera una infracción:",
+        options: [
+            "Leve",
+            "Muy grave",
+            "Moderada",
+            "Grave"
+        ],
+        correct: 3
+    },
+    {
+        question: "¿Quién podrá imponer la detención, fondeo y retención del buque en el lugar que se determine, durante el tiempo imprescindible, cuando uno o varios buques impidiesen o estorbasen el libre acceso a un puerto?",
+        options: [
+            "Capitán Marítimo",
+            "Presidente Autoridad Portuaria",
+            "Ministro de Fomento",
+            "Presidente Puertos del Estado"
+        ],
+        correct: 0
+    },
+    {
+        question: "En todos los supuestos de embargo o retención judicial o administrativa de buques, como medida para garantizar la actividad portuaria, determinará o modificará la ubicación del buque en el puerto:",
+        options: [
+            "Capitanía Maritima",
+            "Salvamento marítimo",
+            "Autoridad Portuaria",
+            "Puertos del Estado"
+        ],
+        correct: 2
+    },
+    {
+        question: "¿Quién elaborará y aprobará las Ordenanzas del Puerto?",
+        options: [
+            "Ministerio de Fomento",
+            "Puertos del Estado",
+            "Autoridades Portuarias",
+            "Consejo de Ministros"
+        ],
+        correct: 2
+    },
+    {
+        question: "¿Quién será la Autoridad competente para la toma de decisiones respecto de los buques necesitados de asistencia, se encuentren en peligro de naufragar o que, en general, supongan una amenaza para la navegación o la integridad del medio ambiente marino?",
+        options: [
+            "Ministro de Fomento",
+            "Ministro del Interior",
+            "Presidente Puertos de Estado",
+            "Director General de la Marina Mercante"
+        ],
+        correct: 3
+    },
+    {
+        question: "¿A quién corresponde la propiedad de los buques abandonados en la zona de servicio del puerto?",
+        options: [
+            "Autoridades Portuarias",
+            "Ministerio de Fomento",
+            "Estado",
+            "Comunidades Autónomas"
+        ],
+        correct: 2
+    },
+    {
+        question: "El incumplimiento de las normas, ordenanzas e instrucciones sobre la manipulación y almacenamiento en tierra de mercancías peligrosas o la ocultación de éstas o de su condición, se considera una infracción:",
+        options: [
+            "Leve",
+            "Moderada",
+            "Grave",
+            "Muy Grave"
+        ],
+        correct: 2
+    },
+    {
+        question: "El incumplimiento de las normas sobre protección marítima por los navieros, capitanes, oficiales o algún otro miembro de la dotación, se considera una infracción:",
+        options: [
+            "Grave",
+            "Leve",
+            "Moderada",
+            "Muy grave"
+        ],
+        correct: 0
+    },
+    {
+        question: "El procedimiento para el otorgamiento de las autorizaciones previstas se podrá iniciar:",
+        options: [
+            "A solicitud del interesado o por concurso convocado al efecto por la Autoridad Portuaria",
+            "Solamente a solicitud del interesado",
+            "Solamente por concurso convocado al efecto por el Ministerio de Fomento",
+            "A solicitud del interesado o por concurso convocado al efecto por el Ministerio de Fomento"
+        ],
+        correct: 0
+    },
+    {
+        question: "En caso de necesitar permanecer un buque atracado a muelle por otros motivos que no sean la carga o descarga (aprovisionamiento, reparaciones, etc.) a quién deberá solicitarlo con antelación:",
+        options: [
+            "A la Comisaría de Explotación",
+            "A la Dirección del Puerto",
+            "A Capitanía Marítima",
+            "Al Servicio de Prácticos"
+        ],
+        correct: 0
+    },
+    {
+        question: "Las solicitudes de autorizaciones que se opongan a lo dispuesto en el Plan Estratégico, en el Plan Director, en la Delimitación de los Espacios y Usos Portuarios, en el plan especial, en su caso, o en la normativa vigente, no se admitirán, archivándose en el plazo máximo de:",
+        options: [
+            "2 meses",
+            "3 meses",
+            "6 meses",
+            "1 mes"
+        ],
+        correct: 0
+    },
+    {
+        question: "Arrojar a la vía o en sus inmediaciones cualquier objeto que pueda dar lugar a la producción de incendios o, en general, poner en peligro la seguridad vial, tendrán la consideración de:",
+        options: [
+            "infracción grave",
+            "infracción muy grave",
+            "infracción leve",
+            "Falta"
+        ],
+        correct: 0
+    },
+    {
+        question: "A quien corresponde el otorgamiento o denegación con carácter discrecional y sin perjuicio de la oportuna motivación, de las autorizaciones cuyo plazo de vigencia no sea superior a un año:",
+        options: [
+            "Director Autoridad Portuaria",
+            "Consejo de Administración. Autoridad Portuaria",
+            "Comisaría de Explotación",
+            "Presidente Autoridad Portuaria"
+        ],
+        correct: 3
+    },
+    {
+        question: "El particular que aprovechare para sí o para un tercero el secreto o la información privilegiada que obtuviere de un funcionario público o autoridad, será castigado con :",
+        options: [
+            "multa del tanto al duplo del beneficio obtenido o facilitado y la pérdida de la posibilidad de obtener subvenciones o ayudas públicas y del derecho a gozar de los beneficios o incentivos fiscales o de la Seguridad Social durante el período de uno a tres años",
+            "multa del tanto al triplo del beneficio obtenido o facilitado y la pérdida de la posibilidad de obtener subvenciones o ayudas públicas y del derecho a gozar de los beneficios o incentivos fiscales o de la Seguridad Social durante el período de uno a tres años",
+            "multa del tanto al triplo del beneficio obtenido o facilitado y la pérdida de la posibilidad de obtener subvenciones o ayudas públicas y del derecho a gozar de los beneficios o incentivos fiscales o de la Seguridad Social durante el período de uno a seis años",
+            "multa del tanto al duplo del beneficio obtenido o facilitado y la pérdida de la posibilidad de obtener subvenciones o ayudas públicas y del derecho a gozar de los beneficios o incentivos fiscales o de la Seguridad Social durante el período de uno a cinco años"
+        ],
+        correct: 1
+    },
+    {
+        question: "La convocatoria del concurso, para la obtención de autorizaciones se publicará en el Boletín Oficial de la Comunidad Autónoma, pudiéndose presentar ofertas en el plazo establecido, que no podrá ser inferior a:",
+        options: [
+            "3 meses",
+            "1 mes",
+            "20 días",
+            "2 meses"
+        ],
+        correct: 2
+    },
+    {
+        question: "Qué se hará con los buques en peligro por hundimiento:",
+        options: [
+            "Se cambiarán al muelle con menos calado",
+            "Se cambiarán al muelle con más calado",
+            "Se sacarán fuera del puerto",
+            "Se mantendrán en los muelles en los que estén"
+        ],
+        correct: 2
+    },
+    {
+        question: "Por norma general el plazo de las concesiones será el que se determine en el título correspondiente y no podrá ser superior a:",
+        options: [
+            "25 años",
+            "40 años",
+            "50 años",
+            "30 años"
+        ],
+        correct: 2
+    },
+    {
+        question: "En el caso de que supere los niveles de gases, humos y ruidos permitidos reglamentariamente los agentes de la autoridad podrán:",
+        options: [
+            "Denunciar e inmovilizar el vehículo",
+            "Denunciar y embargar el vehiculo",
+            "Denunciar y retirar el vehículo",
+            "Ninguna de las anteriores es correcta"
+        ],
+        correct: 0
+    },
+    {
+        question: "Cuando el concesionario efectúe contribución,  a la financiación de infraestructuras de conexión terrestre entre las redes generales de transporte de uso común y las vigentes zonas de servicio de los puertos o los puertos secos en cuya titularidad participe un organismo público portuario. con un mínimo del 20% de la inversión inicial actualizada,  la duración de la concesión:",
+        options: [
+            "Podrá alcanzar 75 años, contando el plazo máximo de la prórroga, unida al plazo inicial.",
+            "No podrá superar 50 años.",
+            "Podrá alcanzar 70 años, contando el plazo máximo de la prórroga, unida al plazo inicial.",
+            "Podrá alcanzar 65 años, contando el plazo máximo de la prórroga, unida al plazo inicial."
+        ],
+        correct: 0
+    },
+    {
+        question: "Como se denomina la señal, con la que debe indicarse que la carga sobresale de la longitud de un vehículo:",
+        options: [
+            "V-30",
+            "V-40",
+            "V-20",
+            "V-10"
+        ],
+        correct: 2
+    },
+    {
+        question: "A quien corresponde el otorgamiento o denegación con carácter discrecional y sin perjuicio de la oportuna motivación, de las autorizaciones cuyo plazo de vigencia  sea superior a un año:",
+        options: [
+            "Director Autoridad Portuaria.",
+            "Consejo de Administración. Autoridad Portuaria.",
+            "Comisaría de Explotación.",
+            "Presidente Autoridad Portuaria."
+        ],
+        correct: 1
+    },
+    {
+        question: "La programación del conjunto de las operaciones del puerto se realizará con la mayor antelación posible y preferentemente con carácter:",
+        options: [
+            "Semanal.",
+            "Mensual.",
+            "Diario.",
+            "Quincenal."
+        ],
+        correct: 0
+    },
+    {
+        question: "Las autoridades o funcionarios públicos que meramente tomaren parte en el abandono colectivo o manifiestamente ilegal de un servicio público esencial y con grave perjuicio de éste o de la comunidad, serán castigados con la pena de:",
+        options: [
+            "multa de ocho a doce meses",
+            "multa de ocho a diez meses",
+            "multa de ocho a doce meses e inhabilitación especial para empleo o cargo público y para el ejercicio del derecho de sufragio pasivo por tiempo de seis a quince años",
+            "multa de ocho a doce meses e inhabilitación especial para empleo o cargo público y para el ejercicio del derecho de sufragio pasivo por tiempo de seis a diez años"
+        ],
+        correct: 0
+    },
+    {
+        question: "Cuándo la Autoridad Portuaria podrá acordar el otorgamiento directo de concesiones demaniales a un solicitante, cuando sean compatibles con sus objetivos:",
+        options: [
+            "Cuando el objeto concesional esté relacionado con la prestación de servicios portuarios",
+            "Cuando el solicitante no sea otra Administración pública",
+            "Cuando el solicitante sea otra Administración pública",
+            "En ningún caso"
+        ],
+        correct: 2
+    },
+    {
+        question: "Los ciclos que, por construcción, no puedan ser ocupados por más de una persona:",
+        options: [
+            "podrán transportar, no obstante, cuando el conductor sea mayor de edad, un menor de hasta 12 años en asiento adicional que habrá de ser homologado",
+            "podrán transportar, no obstante, cuando el conductor sea mayor de edad, un menor de hasta diez años en asiento adicional que habrá de ser homologado",
+            "podrán transportar, no obstante, cuando el conductor sea mayor de edad, un menor de hasta siete años en asiento adicional que habrá de ser homologado",
+            "No podrán transportar a nadie, en ningún caso"
+        ],
+        correct: 2
+    },
+    {
+        question: "Cuando la solicitud de una concesión tenga como objeto la ocupación de espacios de dominio público afectos al servicio de los faros, deberá emitirse informe favorable por:",
+        options: [
+            "Ministerio de Fomento",
+            "Capitanía Marítima",
+            "Autoridad Portuaria",
+            "Puertos del Estado"
+        ],
+        correct: 3
+    },
+    {
+        question: "Cuánto tiempo quedarán depositados en el Puerto Autónomo a disposición de quienes en ese plazo acrediten de modo suficiente su derecho, los bienes abandonados:",
+        options: [
+            "Durante un año",
+            "Durante dos años",
+            "Durante seis meses",
+            "Durante tres años"
+        ],
+        correct: 0
+    },
+    {
+        question: "Quién emitirá informe, en el que se analizará la procedencia de la solicitud de concesión:",
+        options: [
+            "El Presidente Autoridad Portuaria",
+            "El Director de la Autoridad Portuaria",
+            "El Capitán Marítimo",
+            "El Consejo de Administración"
+        ],
+        correct: 1
+    },
+    {
+        question: "A quién corresponde, el establecimiento de normas reguladoras de las operaciones en Lonja de los puertos incluidos en su ámbito de actuación:",
+        options: [
+            "A la Dirección del Puerto Autónomo",
+            "Al Ministerio de Fomento",
+            "A Puertos del Estado",
+            "Al Consejo de Administración del Puerto Autónomo"
+        ],
+        correct: 3
+    },
+    {
+        question: "Cuál será el plazo máximo para notificar la resolución del expediente de la concesión, transcurrido el cual sin que haya recaído resolución expresa, la correspondiente solicitud se entenderá desestimada:",
+        options: [
+            "Seis meses",
+            "Tres meses",
+            "Ocho meses",
+            "Nueve meses"
+        ],
+        correct: 2
+    },
+    {
+        question: "El conductor que, requerido por un agente de la autoridad, se negare a someterse a las pruebas legalmente establecidas para la comprobación de las tasas de alcoholemia y la presencia de las drogas tóxicas, estupefacientes y sustancias psicotrópicas, será castigado con la penas de:",
+        options: [
+            "prisión de seis meses a dos años y privación del derecho a conducir vehículos a motor y ciclomotores por tiempo superior a uno y hasta cuatro años",
+            "prisión de tres meses a un año y privación del derecho a conducir vehículos a motor y ciclomotores por tiempo superior a uno y hasta cinco años",
+            "prisión de seis meses a un año y privación del derecho a conducir vehículos a motor y ciclomotores por tiempo superior a uno y hasta cuatro años",
+            "prisión de seis meses a nueve meses del derecho a conducir vehículos a motor y ciclomotores por tiempo superior a uno y hasta cuatro años"
+        ],
+        correct: 0
+    },
+    {
+        question: "A quién corresponde la resolución del concurso, en lo referente a concesiones:",
+        options: [
+            "A Puertos del Estado",
+            "Al Director de la Autoridad Portuaria",
+            "Al Presidente de la Autoridad Portuaria",
+            "Al Consejo de Administración de la Autoridad Portuaria"
+        ],
+        correct: 3
+    },
+    {
+        question: "Durante los trabajos, los conductores de vehículos destinados a obras o servicios utilizarán la señal luminosa:",
+        options: [
+            "V-20",
+            "V-3",
+            "V-2",
+            "V-20"
+        ],
+        correct: 2
+    },
+    {
+        question: "Transcurrido el plazo voluntario de quince días para el ingreso de los importes de las valoraciones por averías, daños o deméritos, o para el depósito de las fianzas correspondientes, sin que haya sido realizada una u otra acción, a quién se remitirán los respectivos expedientes para el cobro de las cantidades adeudadas por la vía de apremio:",
+        options: [
+            "A la Delegación de Hacienda",
+            "Ministerio de Fomento",
+            "Consejo de Ministros",
+            "Capitanía Marítima"
+        ],
+        correct: 0
+    },
+    {
+        question: "¿Quién informará técnicamente los proyectos de construcción de obras de infraestructura portuaria de los concesionarios que presenten características singulares desde el punto de vista técnico o económico, con carácter previo a su aprobación por la Autoridad Portuaria?",
+        options: [
+            "Consejo de administración",
+            "El Director de la Autoridad Portuaria",
+            "Puertos del Estado",
+            "Ministerio de Fomento"
+        ],
+        correct: 2
+    },
+    {
+        question: "La autoridad o funcionario público que, a sabiendas, sustrajere, destruyere, inutilizare u ocultare, total o parcialmente, documentos cuya custodia le esté encomendada por razón de su cargo, incurrirá en las penas de:",
+        options: [
+            "prisión de uno a tres años, multa de siete a veinticuatro meses, e inhabilitación especial para empleo o cargo público por tiempo de tres a seis años",
+            "prisión de uno a cuatro años, multa de siete a doce meses, e inhabilitación especial para empleo o cargo público por tiempo de tres a cinco años",
+            "prisión de uno a cuatro años, multa de siete a veinticuatro meses, e inhabilitación especial para empleo o cargo público por tiempo de tres a seis años",
+            "multa de seis a doce meses, y suspensión de empleo o cargo público por tiempo de seis meses a dos años"
+        ],
+        correct: 2
+    },
+    {
+        question: "Las infracciones a las normas de este precepto relativas a la prioridad de paso tendrán la consideración de:",
+        options: [
+            "Faltas leves",
+            "Leves",
+            "Graves",
+            "Muy graves"
+        ],
+        correct: 2
+    },
+    {
+        question: "¿Cuál de los siguientes servicios no está incluido en el servicio al pasaje?",
+        options: [
+            "Servicio de carga y descarga de vehículos en régimen de pasaje, entre el muelle o zona de aparcamiento y el buque",
+            "Servicio de carga y descarga de equipajes, así como la recogida de los equipajes a bordo del buque desde el lugar o lugares que se establezcan, su traslado a tierra y su entrega a cada uno de los pasajeros",
+            "El manejo de pasarelas, rampas y otros medios mecánicos de la Autoridad Portuaria cuando se efectúe con el propio personal de la misma",
+            "Servicio de embarque y desembarque de pasajeros"
+        ],
+        correct: 2
+    },
+    {
+        question: "Sin perjuicio de lo que pueda ordenar el agente de la autoridad o, en su caso, indicar el personal de obras y el de acompañamiento de vehículos especiales o en régimen de transporte especial, señala de los siguiente vehículos cuál tiene preferencia de paso, si hay ausencia de señalización:",
+        options: [
+            "Vehículos especiales y en régimen de transporte especial que excedan de las masas o dimensiones establecidas en las normas reguladoras de los vehículos",
+            "Conjunto de vehículos",
+            "Vehículos de tracción animal",
+            "Turismos que arrastran remolques de hasta 750 kilogramos de masa máxima autorizada y autocaravanas"
+        ],
+        correct: 0
+    },
+    {
+        question: "A las autoridades o funcionarios públicos que promovieren, dirigieren u organizaren el abandono colectivo y manifiestamente ilegal de un servicio público, se les castigará con la pena de:",
+        options: [
+            "multa de ocho a doce meses y suspensión de empleo o cargo público por tiempo de seis meses a dos años",
+            "multa de ocho a doce meses y suspensión de empleo o cargo público por tiempo de nueve meses a dos años",
+            "multa de ocho a diez meses y suspensión de empleo o cargo público por tiempo de seis meses a dos años",
+            "multa de ocho a doce meses y suspensión de empleo o cargo público por tiempo de seis meses a un año"
+        ],
+        correct: 0
+    },
+    {
+        question: "Las infracciones a las normas de Vehículos no prioritarios en servicio de urgencia, son de carácter:",
+        options: [
+            "Leve",
+            "Grave",
+            "Muy grave",
+            "Menos grave"
+        ],
+        correct: 1
+    },
+    {
+        question: "No tendrán la consideración de mercancía objeto de tráfico marítimo:",
+        options: [
+            "Mercancía a granel",
+            "Mercancía Contenerizada",
+            "La pesca fresca, el bacalao verde y sus productos elaborados",
+            "Vehículos en régimen de pasaje"
+        ],
+        correct: 2
+    },
+    {
+        question: "¿A quién se dirigirá el escrito de descargo, para recurrir una denuncia puesta por un Policía Portuario?",
+        options: [
+            "Al Consejo de Administración",
+            "Al Director del Puerto Autónomo",
+            "A la Comisaria de Explotación",
+            "Al Consejo Rector"
+        ],
+        correct: 1
+    },
+    {
+        question: "La autoridad o funcionario que, faltando a la obligación de su cargo, dejare intencionadamente de promover la persecución de los delitos de que tenga noticia o de sus responsables, incurrirá en la pena de:",
+        options: [
+            "inhabilitación especial para empleo o cargo público por tiempo de seis meses a dos años",
+            "inhabilitación especial para empleo o cargo público por tiempo de cinco meses a dos años",
+            "inhabilitación especial para empleo o cargo público por tiempo de seis meses a un año",
+            "inhabilitación especial para empleo o cargo público por tiempo de tres meses a un año"
+        ],
+        correct: 0
+    },
+    {
+        question: "¿Cuál de los siguientes servicios, está incluido en el servicio portuario de manipulación de mercancías?",
+        options: [
+            "El embarque y desembarque de vehículos a motor sin matricular",
+            "La conducción, enganche y desenganche de cabezas tractoras que embarquen o desembarquen remolques o semirremolques, si el transporte se produce sin solución de continuidad desde fuera de la zona de servicio del puerto hasta su embarque, o desde el barco hasta fuera de la mencionada zona",
+            "La estiba de la mercancía en bodega o a bordo del buque, de acuerdo con los planes de estiba e indicaciones del capitán del buque o de los oficiales en quienes delegue esta responsabilidad",
+            "El embarque y desembarque de camiones, automóviles y cualquier clase de vehículos a motor, con sus remolques o semirremolques, cuando se realicen por sus propietarios, usuarios o conductores habituales dependientes de aquellos"
+        ],
+        correct: 2
+    },
+    {
+        question: "El funcionario público que, requerido por autoridad competente, no prestare el auxilio debido para la Administración de Justicia u otro servicio público, incurrirá en las penas de:",
+        options: [
+            "multa de tres a diez meses, y suspensión de empleo o cargo público por tiempo de seis meses a dos años",
+            "multa de tres a doce meses, y suspensión de empleo o cargo público por tiempo de seis meses a un año",
+            "multa de seis a doce meses, y suspensión de empleo o cargo público por tiempo de seis meses a dos años",
+            "multa de tres a doce meses, y suspensión de empleo o cargo público por tiempo de seis meses a dos años"
+        ],
+        correct: 3
+    },
+    {
+        question: "Cuando con carácter circunstancial se solicite un servicio para el que no exista tarifa y que no vaya a repetirse con asiduidad, ¿a quién corresponderá la formulación del oportuno presupuesto?",
+        options: [
+            "Al Director del Puerto Autónomo",
+            "Al Presidente del Puerto Autónomo",
+            "Al Consejo de Administración del Puerto Autónomo",
+            "Al Consejo Rector de Puertos del Estado"
+        ],
+        correct: 0
+    },
+    {
+        question: "¿Quién podrá autorizar al naviero o armador, sin necesidad de tramitar una licencia de servicio de manipulación de mercancías, el manejo de medios de carga y descarga propios del buque por personal de su tripulación?",
+        options: [
+            "Capitanía Marítima",
+            "La Autoridad Portuaria",
+            "Puertos del Estado",
+            "Ministerio de Fomento"
+        ],
+        correct: 1
+    },
+    {
+        question: "¿Los conductores de vehículos prioritarios podrán circular en sentido contrario al correspondiente a la calzada?",
+        options: [
+            "No, en ningún caso",
+            "Sí, siempre",
+            "Excepcionalmente siempre que lo hagan por el arcén",
+            "Siempre que lo hagan por la mediana"
+        ],
+        correct: 2
+    },
+    {
+        question: "¿Cuál de los siguientes servicios no estará incluido en el servicio portuario de recepción de desechos generados por los buques?",
+        options: [
+            "La recogida de los residuos de carga y de las sustancias que agotan la capa de ozono y los equipos que las contienen",
+            "El almacenamiento, clasificación y tratamiento previo de los mismos en la zona autorizada por las autoridades competentes",
+            "Las actividades de recogida de desechos generados por buques",
+            "El traslado de los desechos a una instalación de tratamiento autorizada por la Administración competente"
+        ],
+        correct: 0
+    },
+    {
+        question: "El que originare un grave riesgo para la circulación, colocando en la vía obstáculos imprevisibles, derramando sustancias deslizantes o inflamables o mutando, sustrayendo o anulando la señalización o por cualquier otro medio:",
+        options: [
+            "Será castigado con la pena de prisión de tres meses a dos años o a las de multa de diez a veinticuatro meses y trabajos en beneficio de la comunidad de diez a cuarenta días",
+            "Será castigado con la pena de prisión de uno a dos años o a las de multa de doce a veinticuatro meses y trabajos en beneficio de la comunidad de diez a cuarenta días",
+            "Será castigado con la pena de prisión de nueve meses a dos años o a las de multa de doce a veinticuatro meses y trabajos en beneficio de la comunidad de diez a cuarenta días",
+            "Será castigado con la pena de prisión de seis meses a dos años o a las de multa de doce a veinticuatro meses y trabajos en beneficio de la comunidad de diez a cuarenta días"
+        ],
+        correct: 3
+    },
+    {
+        question: "¿Quién será el instructor de los procedimientos sancionadores, por norma general?",
+        options: [
+            "Contramaestre de la Policía Portuaria",
+            "El Comisario de Explotación",
+            "El Director",
+            "El Presidente"
+        ],
+        correct: 2
+    },
+    {
+        question: "Si la recogida de desechos se realizara por medios marinos o tiene lugar en la Zona II del puerto la tarifa fija será:",
+        options: [
+            "un 25 por ciento superior que la establecida para la recogida en Zona I",
+            "un 15 por ciento superior que la establecida para la recogida en Zona I",
+            "un 20 por ciento superior que la establecida para la recogida en Zona I",
+            "un 50 por ciento superior que la establecida para la recogida en Zona I"
+        ],
+        correct: 0
+    },
+    {
+        question: "A la autoridad o funcionario público que, en el ejercicio de su competencia y a sabiendas de su ilegalidad, propusiere, nombrare o diere posesión para el ejercicio de un determinado cargo público a cualquier persona sin que concurran los requisitos legalmente establecidos para ello, se le castigará con las penas de:",
+        options: [
+            "multa de seis a ocho meses y suspensión de empleo o cargo público por tiempo de uno a tres años",
+            "multa de tres a ocho meses y suspensión de empleo o cargo público por tiempo de uno a tres años",
+            "multa de tres a ocho meses y suspensión de empleo o cargo público por tiempo de uno a cuatro años",
+            "multa de tres a nueve meses y suspensión de empleo o cargo público por tiempo de dos a tres años"
+        ],
+        correct: 1
+    },
+    {
+        question: "Las infracciones a las normas referidas a las intersecciones, se consideran:",
+        options: [
+            "Leves",
+            "Muy graves",
+            "Graves",
+            "Faltas leves"
+        ],
+        correct: 2
+    },
+    {
+        question: "Si durante la instrucción de un expediente se incluyeran pruebas o se aportaran datos distintos de los conocidos por el denunciado, una vez informado, ¿qué plazo tendrá para poder alegar cuanto estime conveniente en su defensa?",
+        options: [
+            "15 días, contados a partir del siguiente al de su conocimiento",
+            "10 días, contados a partir del siguiente al de su conocimiento",
+            "8 días, contados a partir del siguiente al de su conocimiento",
+            "15 días, contados a partir del mismo día de su conocimiento"
+        ],
+        correct: 2
+    },
+    {
+        question: "El coeficiente a aplicar a la tarifa fija a un buque de más de 100.000 GT., en cada escala en un puerto, será de:",
+        options: [
+            "4,00",
+            "20,00",
+            "24,00",
+            "6,00"
+        ],
+        correct: 2
+    },
+    {
+        question: "El que condujere un vehículo a motor o un ciclomotor con temeridad manifiesta y pusiere en concreto peligro la vida o la integridad de las personas, con manifiesto desprecio por la vida de los demás será castigado con las penas:",
+        options: [
+            "Prisión de dos a cinco años, multa de doce a veinticuatro meses y privación del derecho a conducir vehículos a motor y ciclomotores durante un período de seis a diez años",
+            "Prisión de seis meses a dos años y privación del derecho a conducir vehículos a motor y ciclomotores por tiempo superior a uno y hasta seis años",
+            "Prisión de cinco años, multa de doce a veinticuatro meses y privación del derecho a conducir vehículos a motor y ciclomotores durante un período de seis a diez años",
+            "Prisión de uno a cinco años, multa de diez a veinticuatro meses y privación del derecho a conducir vehículos a motor y ciclomotores durante un período de seis a diez años"
+        ],
+        correct: 0
+    },
+
+];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = new Array(questions.length).fill(false);
+        let userAnswers = new Array(questions.length).fill(-1);
+        let currentQuestions = [...questions];
+        let autoAdvanceTimer = null;
+
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const prevButton = document.getElementById('prev-btn');
+        const nextButton = document.getElementById('next-btn');
+        const currentQuestionSpan = document.getElementById('current-question');
+        const totalQuestionsSpan = document.getElementById('total-questions');
+        const quizSection = document.getElementById('quiz-section');
+        const resultsSection = document.getElementById('results-section');
+        const shuffleButton = document.getElementById('shuffle-btn');
+        const progressFill = document.getElementById('progressFill');
+
+        totalQuestionsSpan.textContent = questions.length;
+
+        function updateProgressBar() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            progressFill.style.width = `${progress}%`;
+        }
+
+        function showQuestion(index) {
+            const question = currentQuestions[index];
+            questionElement.textContent = question.question;
+            optionsElement.innerHTML = '';
+            
+            question.options.forEach((option, i) => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.textContent = option;
+                
+                if (answered[index]) {
+                    if (i === question.correct) {
+                        button.classList.add('correct');
+                    }
+                    if (i === userAnswers[index] && i !== question.correct) {
+                        button.classList.add('incorrect');
+                    }
+                    if (i === userAnswers[index]) {
+                        button.classList.add('selected');
+                    }
+                } else {
+                    button.addEventListener('click', () => selectOption(button, i));
+                }
+                
+                optionsElement.appendChild(button);
+            });
+            
+            currentQuestionSpan.textContent = index + 1;
+            prevButton.disabled = index === 0;
+            nextButton.textContent = index === currentQuestions.length - 1 ? 'Finalizar' : 'Siguiente';
+            nextButton.disabled = !answered[index] && index !== currentQuestion;
+            updateProgressBar();
+        }
+
+        function selectOption(button, optionIndex) {
+            if (autoAdvanceTimer) {
+                clearTimeout(autoAdvanceTimer);
+            }
+            
+            const allOptions = optionsElement.children;
+            Array.from(allOptions).forEach(opt => opt.classList.remove('selected'));
+            button.classList.add('selected');
+            
+            if (!answered[currentQuestion]) {
+                answered[currentQuestion] = true;
+                userAnswers[currentQuestion] = optionIndex;
+                
+                if (optionIndex === currentQuestions[currentQuestion].correct) {
+                    score++;
+                    button.classList.add('correct');
+                } else {
+                    button.classList.add('incorrect');
+                    allOptions[currentQuestions[currentQuestion].correct].classList.add('correct');
+                }
+                
+                nextButton.disabled = false;
+                
+                autoAdvanceTimer = setTimeout(() => {
+                    if (currentQuestion < questions.length - 1) {
+                        currentQuestion++;
+                        showQuestion(currentQuestion);
+                    } else {
+                        showScore();
+                    }
+                }, 1000);
+            }
+        }
+
+        function showScore() {
+            const detailedResults = document.getElementById('detailed-results');
+            
+            quizSection.style.display = 'none';
+            resultsSection.style.display = 'block';
+
+            const percentage = (score / questions.length) * 100;
+            document.getElementById('total-correct').textContent = score;
+            document.getElementById('total-incorrect').textContent = questions.length - score;
+            document.getElementById('total-percentage').textContent = percentage.toFixed(1);
+
+            const scoreElement = document.getElementById('score');
+            scoreElement.innerHTML = '<h2>Resultado Final</h2>';
+
+            detailedResults.innerHTML = '';
+            
+            currentQuestions.forEach((question, index) => {
+                if (userAnswers[index] !== question.correct) {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+                    resultItem.innerHTML = `
+                        <div class="result-question">
+                            <strong>${question.question}</strong>
+                        </div>
+                        <div class="result-options">
+                            <p><strong>Respuesta correcta:</strong> ${question.options[question.correct]}</p>
+                        </div>
+                    `;
+                    detailedResults.appendChild(resultItem);
+                }
+            });
+
+            if (detailedResults.children.length === 0) {
+                detailedResults.innerHTML = '<h3>¡Felicitaciones! Has respondido todo correctamente</h3>';
+            }
+        }
+
+        function shuffleQuestions() {
+            for (let i = currentQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [currentQuestions[i], currentQuestions[j]] = [currentQuestions[j], currentQuestions[i]];
+            }
+        }
+
+        function resetQuiz(shuffle = false) {
+            if (autoAdvanceTimer) {
+                clearTimeout(autoAdvanceTimer);
+            }
+            
+            currentQuestion = 0;
+            score = 0;
+            answered = new Array(questions.length).fill(false);
+            userAnswers = new Array(questions.length).fill(-1);
+            
+            if (shuffle) {
+                shuffleQuestions();
+            } else {
+                currentQuestions = [...questions];
+            }
+            
+            quizSection.style.display = 'block';
+            resultsSection.style.display = 'none';
+            
+            showQuestion(currentQuestion);
+        }
+
+        prevButton.addEventListener('click', () => {
+            if (autoAdvanceTimer) {
+                clearTimeout(autoAdvanceTimer);
+            }
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (autoAdvanceTimer) {
+                clearTimeout(autoAdvanceTimer);
+            }
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            } else {
+                showScore();
+            }
+        });
+
+        document.getElementById('restart-btn').addEventListener('click', () => resetQuiz(false));
+
+        shuffleButton.addEventListener('click', () => {
+            if (confirm('¿Quieres mezclar las preguntas y empezar de nuevo?')) {
+                resetQuiz(true);
+            }
+        });
+
+        showQuestion(currentQuestion);
+    </script>
+</body>
+</html>
